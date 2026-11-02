@@ -1,0 +1,15 @@
+[submodule "references/bloodborne-android"]
+	path = references/bloodborne-android
+	url = https://github.com/StanTheMackiar/bloodborne-android-port
+[submodule "references/shadow-of-the-colossus-pc"]
+	path = references/shadow-of-the-colossus-pc
+	url = https://github.com/AjncSystem/ShadowOfTheColossus-PC
+[submodule "references/p5r-android"]
+	path = references/p5r-android
+	url = https://github.com/Brandon04Gonzalez/p5r-android
+[submodule "references/shadps4"]
+	path = references/shadps4
+	url = https://github.com/shadps4-emu/shadPS4
+[submodule "references/fexcore"]
+	path = references/fexcore
+	url = https://github.com/FEX-Emu/FEX

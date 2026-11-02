@@ -1,0 +1,33 @@
+# System & Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+.idea/
+.vscode/
+
+# Game & Binary Data (Strictly Prohibited from Repository)
+*.pkg
+*.elf
+*.bin
+*.prx
+*.sprx
+*.pak
+*.ucas
+*.utoc
+*.usm
+*.acb
+*.awb
+*.keys
+*.sfo
+*.iso
+*.nsp
+*.xci
+
+# Build outputs
+build/
+bin/
+obj/
+*.apk
+*.so
+*.a
