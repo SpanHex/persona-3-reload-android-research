@@ -1,0 +1,63 @@
+{
+  "test_suite_version": "1.0.0-phase3-poc",
+  "target_guest_isa": "x86_64",
+  "target_host_isa": "aarch64",
+  "target_platform": "android-arm64",
+  "abi_version": 2,
+  "fixtures": [
+    {
+      "id": "01_arithmetic",
+      "source": "phase3-poc/tests/fixtures/01_arithmetic.c",
+      "binary": "phase3-poc/tests/bin/01_arithmetic.bin",
+      "description": "Integer arithmetic, safe division, bitwise ops, recursion (factorial, fibonacci)",
+      "base_vaddr": "0x401000",
+      "entrypoint": "0x401000",
+      "expected_hex": "0x9e3779297ec9e89d",
+      "status": "VERIFIED_ORACLE"
+    },
+    {
+      "id": "02_dispatch",
+      "source": "phase3-poc/tests/fixtures/02_dispatch.c",
+      "binary": "phase3-poc/tests/bin/02_dispatch.bin",
+      "extra_entries": "phase3-poc/tests/fixtures/02_extra_entries.txt",
+      "description": "Direct calls, indirect function pointers, simulated C++ vtable dispatch, jump table switches",
+      "base_vaddr": "0x402000",
+      "entrypoint": "0x402000",
+      "expected_hex": "0xa32",
+      "expected_decimal": 2610,
+      "status": "VERIFIED_ORACLE"
+    },
+    {
+      "id": "03_memory_reloc",
+      "source": "phase3-poc/tests/fixtures/03_memory_reloc.c",
+      "binary": "phase3-poc/tests/bin/03_memory_reloc.bin",
+      "description": "Global rodata/data access, struct traversal, pointer arithmetic, stack alignment",
+      "base_vaddr": "0x403000",
+      "entrypoint": "0x403000",
+      "expected_hex": "0x100005b34",
+      "status": "VERIFIED_ORACLE"
+    },
+    {
+      "id": "04_vector_simd",
+      "source": "phase3-poc/tests/fixtures/04_vector_simd.c",
+      "binary": "phase3-poc/tests/bin/04_vector_simd.bin",
+      "description": "SSE/SSE2 packed float, packed int, and packed double vector operations",
+      "base_vaddr": "0x404000",
+      "entrypoint": "0x404000",
+      "expected_hex": "0x258",
+      "expected_decimal": 600,
+      "status": "VERIFIED_ORACLE"
+    },
+    {
+      "id": "05_control_concurrency",
+      "source": "phase3-poc/tests/fixtures/05_control_concurrency.c",
+      "binary": "phase3-poc/tests/bin/05_control_concurrency.bin",
+      "description": "Spin-wait volatile loop simulation, atomic fetch-and-add / compare-and-swap, nested error flow",
+      "base_vaddr": "0x405000",
+      "entrypoint": "0x405000",
+      "expected_hex": "0xe6",
+      "expected_decimal": 230,
+      "status": "VERIFIED_ORACLE"
+    }
+  ]
+}

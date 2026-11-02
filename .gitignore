@@ -31,3 +31,6 @@ obj/
 *.apk
 *.so
 *.a
+*.o
+__pycache__/
+*.pyc

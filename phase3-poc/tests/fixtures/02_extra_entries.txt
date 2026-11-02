@@ -1,0 +1,5 @@
+# Extra entries for 02_dispatch indirect calls
+miss 0x4020c2
+miss 0x4020c9
+miss 0x4020d0
+miss 0x4020d8

@@ -1,13 +1,38 @@
 # Persona 3 Reload — PS4 to Android Technical Research & Architecture
 
-[![Status](https://img.shields.io/badge/Phase_1_%26_2-Research_Complete-success?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3-Research_%26_POC_Complete-success?style=for-the-badge)](#)
 [![Target](https://img.shields.io/badge/Target-Android_ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge)](#licensing--legal-compliance)
 [![Engine](https://img.shields.io/badge/Engine-Unreal_Engine_4.27-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white)](#)
 
-> **RESEARCH DELIVERABLES (PHASES 1 & 2):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation evaluation, and feasibility audit for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
+> **RESEARCH & PROOF-OF-CONCEPT DELIVERABLES (PHASES 1, 2 & 3):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, and empirical execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
 > 
-> *Notice: This repository contains research documents, architecture maps, dependency matrices, and system diagrams only. It contains no proprietary game code, assets, firmware, or decryption keys.*
+> *Notice: This repository contains research documents, architecture maps, dependency matrices, proof-of-concept compilers, and system diagrams only. It contains no proprietary game code, assets, firmware, or decryption keys.*
+
+---
+
+## 🚀 PHASE 3: AOT RECOMPILATION PROOF OF CONCEPT (COMPLETE)
+
+Phase 3 constructed, executed, and verified a standalone Ahead-of-Time (AOT) recompilation pipeline and Android runtime test harness located in [`phase3-poc/`](phase3-poc/):
+- **Core Pipeline:** x86-64 machine code &rarr; iterative discovery &rarr; LLVM IR basic-block CFG &rarr; native AArch64 ELF shared objects (`.o`), GNU assembly (`.s`), and C dispatch tables (`.c`).
+- **Target Architecture:** `aarch64-unknown-linux-android30` with `+v8.2a,+lse,+crc,+fp-armv8,+neon` (Snapdragon 7s Gen 2 / Realme 12 Pro+).
+- **Automated Validation:** 100% pass rate (5/5 synthetic fixtures) in [`runner.py`](phase3-poc/android-runtime/runner.py).
+
+Phase 3 produced 11 dedicated technical reports located in [`documentation/PHASE_3/`](documentation/PHASE_3/):
+
+| Document | Report Title | Core Focus & Findings |
+|---|---|---|
+| [`P3R-DOC-P3-001`](documentation/PHASE_3/REFERENCE_SOURCE_AUDIT.md) | **[Reference Source Audit](documentation/PHASE_3/REFERENCE_SOURCE_AUDIT.md)** | Deep source audit of `Bloodborne-android-rebuild-tool` (`discover.cpp`, `lifter.cpp`, `lower_ops.cpp`, `compile.cpp`) and `Bloodborne-Android` runtime (`guest_cpu_aot.cpp`, `docs/RECOMP_ABI.md`). Direct line-by-line answers to all 12 source questions. |
+| [`P3R-DOC-P3-002`](documentation/PHASE_3/SYNTHETIC_TEST_SUITE.md) | **[Synthetic Test Suite Specification](documentation/PHASE_3/SYNTHETIC_TEST_SUITE.md)** | Architectural specification of the 5 synthetic C test fixtures, ABI test cases, oracle return value manifest (`manifest.json`), and evaluation of PS4 ELF loading vs isolated lifting harness. |
+| [`P3R-DOC-P3-003`](documentation/PHASE_3/AOT_COMPILER_IMPLEMENTATION.md) | **[AOT Recompiler Implementation](documentation/PHASE_3/AOT_COMPILER_IMPLEMENTATION.md)** | Architectural specification of the recompiler pipeline (`abi.py`, `discover.py`, `lower.py`, `codegen.py`, `p3r_recomp.py`). Details the 696-byte `GuestState`, basic-block CFG generation, and safe division wrappers. |
+| [`P3R-DOC-P3-004`](documentation/PHASE_3/ANDROID_EXECUTION_VALIDATION.md) | **[Android Execution & ABI Validation](documentation/PHASE_3/ANDROID_EXECUTION_VALIDATION.md)** | Verification of System V AMD64 vs ARM64 AAPCS64 calling conventions. Evaluates `GuestState*` in X0, callee-saved preservation in X19, 16-byte stack frame alignment, and Bionic libc compatibility. |
+| [`P3R-DOC-P3-005`](documentation/PHASE_3/FUNCTION_DISCOVERY_RESULTS.md) | **[Function Discovery & Indirect Call Validation](documentation/PHASE_3/FUNCTION_DISCOVERY_RESULTS.md)** | Empirical evaluation of 16-round discovery against Fixture 02. Compares static CFG discovery (3 functions / 42.9% coverage) against augmented extra-entries discovery (7 functions / 100% coverage). |
+| [`P3R-DOC-P3-006`](documentation/PHASE_3/MEMORY_AND_RELOCATION_RESULTS.md) | **[Memory & Concurrency Validation](documentation/PHASE_3/MEMORY_AND_RELOCATION_RESULTS.md)** | Validation of memory addressing, RIP-relative offsets, linked list pointer dereferencing, 16-byte stack alignment, volatile memory reload preservation (fixing commit `ef1a331`), and hardware atomics (`lock xadd`, `lock cmpxchg` mapped to ARMv8.2-A LSE). |
+| [`P3R-DOC-P3-007`](documentation/PHASE_3/REALME_DEVICE_TEST_RESULTS.md) | **[Realme 12 Pro+ Hardware Characterization](documentation/PHASE_3/REALME_DEVICE_TEST_RESULTS.md)** | Detailed characterization of the Realme 12 Pro+ (Snapdragon 7s Gen 2 / Adreno 710). Documents physical ADB device connection status (`0 devices attached`), measured compiler throughput, code expansion ($1.57\times$), and memory bandwidth bottleneck ($17\text{ GB/s}$). |
+| [`P3R-DOC-P3-008`](documentation/PHASE_3/AOT_DBT_HYBRID_DECISION.md) | **[Architectural Comparison & Final Decision](documentation/PHASE_3/AOT_DBT_HYBRID_DECISION.md)** | Exhaustive comparative analysis between Option A (Pure DBT / FEXCore), Option B (Pure AOT / Bloodborne-style), and Option C (Hybrid Architecture). Concludes with the unanimous adoption of Option C for Persona 3 Reload. |
+| [`P3R-DOC-P3-009`](documentation/PHASE_3/RISK_REGISTER.md) | **[Phase 3 Risk Register](documentation/PHASE_3/RISK_REGISTER.md)** | Comprehensive audit of 7 critical architectural, hardware, compiler, and OS risks, with probability, impact, severity ratings, and concrete mitigation plans. |
+| [`P3R-DOC-P3-010`](documentation/PHASE_3/PHASE_3_INDEX.md) | **[Phase 3 Documentation Index](documentation/PHASE_3/PHASE_3_INDEX.md)** | Master reading index for Phase 3 proof-of-concept reports, deliverables, and code artifacts. |
+| [`P3R-DOC-P3-011`](documentation/PHASE_3/FINAL_POC_REPORT.md) | **[Final Proof-of-Concept Report](documentation/PHASE_3/FINAL_POC_REPORT.md)** | Executive capstone report directly answering all 10 prompt research questions. Delivers the final **CONDITIONAL GO (HYBRID AOT + DBT)** project verdict with Phase 4 gating criteria. |
 
 ---
 
