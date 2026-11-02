@@ -1,0 +1,66 @@
+flowchart TD
+    subgraph Storage["Storage & Ingestion Layer"]
+        UserDump["User Legitimate PS4 Dump (/app0/)<br/>eboot.bin, libc.prx, libSceFios2.prx, Paks/"]
+        Prep["p3r-prepare (Offline Relocation & PRX Linker)"]
+        BootImg["boot-linked.bin (BBPROBE5 Flattened Memory Image)"]
+    end
+
+    subgraph AndroidApp["Android Frontend Layer (Java / Kotlin / NDK)"]
+        UI["MainActivity: Settings, Virtual Pad, Driver Catalog"]
+        Present["libp3rpresent.so: ASurfaceControl Latch / FIFO Pacing"]
+        Audio["AudioBridge / AAudio: PCM Stream Output"]
+        Touch["TouchControllerOverlay: DualShock 4 Virtual Touchpad"]
+    end
+
+    subgraph NativeRuntime["Native Compatibility Process (ARM64 Bionic: p3r-probe)"]
+        Bootstrap["Loader Bootstrap: Low-Memory Allocator (< 1 TiB), Trap Table"]
+        
+        subgraph FEXCore_DBT["FEXCore Dynamic Binary Translation Engine"]
+            JIT["Arm64 JIT Emitter (NEON / SVE)"]
+            Stubs["16-Byte Host Stub Table (mov r10, rcx; syscall; ret)"]
+            Bridge["p3rcpu_host_call (SysV x86-64 -> AAPCS64 ARM64)"]
+            Guest["Translated UE4.27 Machine Code (AMD Jaguar AVX/BMI1)"]
+        end
+
+        subgraph PS4_HLE["PS4 Native Compatibility Layer (Native ARM64 C/C++)"]
+            Kernel["runtime_kernel.c: Bionic pthreads, Mutexes, Semaphores"]
+            Fiber["runtime_fiber.c: SceFiber User-Mode Scheduler for FEX"]
+            Memory["runtime_memory.c: Direct Memory (Dual-view ashmem/memfd)"]
+            Fios["runtime_file.c: /app0 File Router & IO Store Cache"]
+            AudioHLE["runtime_audio.c: CriAtomEx Output -> NDK AAudio Engine"]
+            PadHLE["runtime_pad.c: Gamepad State Buffer"]
+            SaveHLE["runtime_savedata.c: Savegame Sandbox Storage"]
+        end
+
+        subgraph VideoCore["GPU Renderer (shadPS4 Liverpool on Vulkan 1.3)"]
+            PM4["PM4 Packet Processor (CP Packet 3 Decoder)"]
+            Shader["Shader Recompiler (AMD GCN Bytecode -> SPIR-V)"]
+            Pipe["Vulkan 1.3 Pipeline & Descriptor State Tracker"]
+            Cache["Texture Cache (GCN Untiling) & Buffer Pool"]
+        end
+
+        Turnip["Mesa Turnip Driver (libvulkan_freedreno.so via dlopen)"]
+        Adreno["Qualcomm Adreno 710 / 740 GPU (/dev/kgsl-3d0)"]
+    end
+
+    UserDump --> Prep
+    Prep --> BootImg
+    BootImg --> Bootstrap
+    UI --> NativeRuntime
+    Bootstrap --> FEXCore_DBT
+    Bootstrap --> PS4_HLE
+    Bootstrap --> VideoCore
+    Guest -- "Imported NID Call" --> Stubs
+    Stubs --> Bridge
+    Bridge --> PS4_HLE
+    Guest -- "libGnm PM4 Submissions" --> PM4
+    PM4 --> Shader
+    Shader --> Pipe
+    Pipe --> Cache
+    Pipe --> Turnip
+    Turnip --> Adreno
+    Adreno -- "Rendered AHardwareBuffer" --> Present
+    Present --> UI
+    Touch --> PadHLE
+    AudioHLE --> Audio
+

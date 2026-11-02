@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    participant Game as Translated Game Code (UE4.27 in FEXCore)
+    participant Stub as 16-Byte Host Stub (0x0F 0x05 Syscall)
+    participant FEX as FEXCore SyscallHandler (guest_cpu_fex.cpp)
+    participant AsmBridge as bbcpu_host_call (host_call_arm64.S)
+    participant Runtime as PS4 System Runtime (Native ARM64 C)
+    participant Liverpool as shadPS4 Liverpool (Video Core)
+    participant Turnip as Mesa Turnip Vulkan Driver
+    participant Surface as Android ASurfaceControl (SurfaceFlinger)
+
+    Note over Game: UE4 Game Thread executes actor tick & logic
+    Game->>Stub: CALL [Import Address: scePthreadCreate / sceGnmSubmitCommandBuffers]
+    Note over Stub: mov r10, rcx<br/>syscall<br/>ret
+    Stub->>FEX: FEXCore intercepts syscall at guest RIP
+    FEX->>FEX: Calculate stub index = (rip - stubs) / 16
+    FEX->>AsmBridge: CallHost(CPUState, stub_functions[index])
+    Note over AsmBridge: Marshal x86-64 SysV registers to ARM64 AAPCS64 (x0-x7, v0-v7)
+    AsmBridge->>Runtime: Execute Native Host Function (e.g. bbgpu_submit)
+    
+    alt Graphics Submission Path
+        Runtime->>Liverpool: Iterate PM4 Packets (Draws, Context Regs, Dispatches)
+        Liverpool->>Liverpool: Translate GCN Shaders to SPIR-V (if not cached)
+        Liverpool->>Turnip: vkCmdDrawIndexed / vkCmdDispatch
+        Turnip->>Turnip: Qualcomm KGSL Hardware Submission (/dev/kgsl-3d0)
+        Turnip-->>Surface: Present to AHardwareBuffer via ASurfaceControl
+    else OS Service Path
+        Runtime->>Runtime: Execute Bionic pthread / file read / audio mix
+    end
+
+    Runtime-->>AsmBridge: Return status / pointers (x0/x1, v0/v1)
+    AsmBridge-->>FEX: Write return values into RAX/RDX and XMM0/XMM1
+    FEX->>Game: Advance guest RIP (+2 past syscall) and resume execution
+
