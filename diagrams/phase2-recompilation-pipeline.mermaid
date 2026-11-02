@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph Input_Stage ["1. Binary Ingestion & Parsing"]
+        A["PS4 eboot.bin (78.5 MB AMD Jaguar x86-64)"] --> B["ELF Program Header Parser (elf_image.cpp)"]
+        C["Companion PRXs (libc.prx, libSceFios2.prx)"] --> B
+        B --> D["Virtual Memory Segment Allocation (@ 0x3a7700000000)"]
+    end
+
+    subgraph Discovery_Stage ["2. Iterative Control Flow Discovery"]
+        D --> E["DWARF .eh_frame FDE Scanner (fde_scan.cpp, eh_frame.cpp)"]
+        E --> F["Initial Baseline Functions (kind 0 ~460k)"]
+        D --> G["Dynamic Relocation Scraper (.rela.dyn, .rela.plt)"]
+        D --> H["UE4 Reflection & VTable Scraper (GNames & GUObjectArray)"]
+        F --> I["Iterative Discovery Loop (discover.cpp: 16 Rounds)"]
+        G --> I
+        H --> I
+        J["Jump Table Analyzer (jumptable.cpp: Switch Cases)"] --> I
+        K["Runtime Miss Feedback (logs/aot-misses.log via --extra-entries)"] --> I
+        I --> L["Comprehensive Discovered Unit Manifest (bbr_units)"]
+    end
+
+    subgraph Lifting_Stage ["3. Frontend SSA IR Lifting"]
+        L --> M["FEXCore Instruction Decoder (lifter.cpp)"]
+        M --> N["OpcodeDispatcher: Decompose x86 CISC to Atomic Micro-Ops"]
+        N --> O["Static Single Assignment (SSA) Intermediate Representation"]
+    end
+
+    subgraph Lowering_Stage ["4. LLVM IR Generation & Optimization"]
+        O --> P["LLVM IR Lowerer (lower_llvm.cpp, lower_ops.cpp, lower_vector.cpp)"]
+        P --> Q["GuestState Register Allocation via alloca (mem2reg / SROA)"]
+        Q --> R["Callee-Saved SysV ABI Optimization (rbx, rbp, r12-r15)"]
+        R --> S["LLVM PassBuilder (O2 Pipeline: GVN, DSE, InstCombine, Volatile Loops)"]
+    end
+
+    subgraph Codegen_Stage ["5. AArch64 Machine Codegen & Linking"]
+        S --> T["Sharder (128 Independent Compilation Units)"]
+        T --> U["LLVM AArch64 TargetMachine (aarch64-unknown-linux-android30)"]
+        U --> V["128 ELF PIC Object Shards (game.000.o ... game.127.o)"]
+        V --> W["Android NDK ld.lld Linker (-shared -O2 --gc-sections)"]
+        W --> X["libp3raot.so (Recomp ABI v2 Native Library)"]
+    end

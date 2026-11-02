@@ -13,3 +13,12 @@
 [submodule "references/fexcore"]
 	path = references/fexcore
 	url = https://github.com/FEX-Emu/FEX
+[submodule "references/bloodborne-android-rebuild-tool"]
+	path = references/bloodborne-android-rebuild-tool
+	url = https://github.com/ducvd89/Bloodborne-android-rebuild-tool
+[submodule "references/bloodborne-android-upstream"]
+	path = references/bloodborne-android-upstream
+	url = https://github.com/ducvd89/Bloodborne-Android
+[submodule "references/bloodborne-pc"]
+	path = references/bloodborne-pc
+	url = https://github.com/deadinside28/bloodborne_pc

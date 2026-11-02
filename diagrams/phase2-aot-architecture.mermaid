@@ -1,0 +1,84 @@
+flowchart TD
+    subgraph Offline_Host_PC ["Stage 1: Offline Recompilation (User PC: Windows / Linux)"]
+        UserDump["User Legitimate PS4 Dump<br/>(eboot.bin, libc.prx, libSceFios2.prx, .ucas/.utoc)"]
+        
+        subgraph P3R_Recomp_Tool ["p3r-recomp (Based on Bloodborne Rebuild Tool)"]
+            ElfPacker["Dynamic ELF Segment Packer & Relocation Scraper"]
+            UEScraper["UE4 Reflection & VTable Scraper (GNames & GUObjectArray)"]
+            Lifter["FEXCore SSA Frontend Instruction Lifter (lifter.cpp)"]
+            LLVM_Lower["LLVM IR Lowering & GuestState Mapper (lower_llvm.cpp)"]
+            Passes["LLVM PassBuilder (O2, SROA, GVN, DSE, Volatile Loads)"]
+            Shards["AArch64 PIC Object Codegen (128 Shards)"]
+            Linker["Android NDK ld.lld Linker"]
+        end
+        
+        UserDump --> ElfPacker
+        ElfPacker --> UEScraper
+        UEScraper --> Lifter
+        Lifter --> LLVM_Lower
+        LLVM_Lower --> Passes
+        Passes --> Shards
+        Shards --> Linker
+        Linker --> AOT_SO["libp3raot.so (Native AArch64 Shared Library ~400 MB)"]
+    end
+
+    subgraph Mobile_Device ["Stage 2: Mobile Execution (realme 12 Pro+ / Android 14)"]
+        AOT_SO -->|Transfer via USB/Storage| AndroidApp
+        
+        subgraph AndroidApp ["Android Frontend Layer (Java / Kotlin / NDK)"]
+            UI["MainActivity: Game Directory Selector, Button Remapping"]
+            Touch["TouchControllerOverlay: DualShock 4 Virtual Controls"]
+            Present["libp3rpresent.so: ASurfaceControl Latch / VSync Pacing"]
+            AudioBridge["AudioBridge: AAudio 48 kHz PCM Stream Output"]
+        end
+
+        subgraph NativeRuntime ["Native Android Runtime (ARM64: libp3rcpu.so)"]
+            Loader["dlopen('libp3raot.so') & Memory Allocator (< 1 TiB)"]
+            
+            subgraph AOT_Execution ["Native CPU Engine (guest_cpu_aot.cpp)"]
+                UnitsTable["Unit Table (bbr_units[], bbr_dirty[])"]
+                Dispatcher["Unit Dispatcher (bbr_dispatch / Golden Ratio Hash)"]
+                HostBridge["bbcpu_host_call (SysV x86 -> AAPCS64 ARM64)"]
+                Atomics["guest_cpu_atomics.h: SIGBUS Split-Lock Emulator"]
+                ARM_Cores["Physical ARM64 Cores (Cortex-A78 @ 2.4 GHz)"]
+            end
+
+            subgraph Merged_PS4_Layer ["PS4 Compatibility Layer (Native C++)"]
+                Kernel["libkernel: Bionic pthreads, Mutexes, Semaphores"]
+                Fios["libSceFios2: Asynchronous IO Store (.ucas/.utoc) Reader"]
+                AudioHLE["libSceAudioOut: CriWare Stream -> AAudio Output"]
+                PadHLE["libScePad: MotionEvent & Gamepad State Buffer"]
+                SaveHLE["libSceSaveData: Sandboxed Local Directory Storage"]
+                SystemModules["shadPS4 Ported Modules (AppContent, DiscMap, SystemService)"]
+            end
+
+            subgraph Vulkan_Renderer ["GPU Renderer (shadPS4 Liverpool on Vulkan 1.3)"]
+                PM4["PM4 Packet Processor (CP Packet 3 Decoder)"]
+                Shader["Shader Recompiler (AMD GCN Bytecode -> SPIR-V)"]
+                WaveFix["Wave64 -> Wave32 Subgroup Barrier Remapping"]
+                FSR["AMD FidelityFX Super Resolution (540p/720p -> 1080p)"]
+                Turnip["Mesa Turnip Driver (libvulkan_freedreno.so)"]
+            end
+
+            Adreno["Qualcomm Adreno 710 GPU (/dev/kgsl-3d0)"]
+        end
+
+        UI --> Loader
+        Loader --> UnitsTable
+        UnitsTable --> Dispatcher
+        Dispatcher --> ARM_Cores
+        ARM_Cores -- "Indirect Call" --> Dispatcher
+        ARM_Cores -- "Unaligned Atomic" --> Atomics
+        ARM_Cores -- "Host System Call" --> HostBridge
+        HostBridge --> Merged_PS4_Layer
+        ARM_Cores -- "GNM PM4 Stream" --> PM4
+        PM4 --> Shader
+        Shader --> WaveFix
+        WaveFix --> FSR
+        FSR --> Turnip
+        Turnip --> Adreno
+        Adreno -- "Rendered Buffer" --> Present
+        Present --> UI
+        Touch --> PadHLE
+        AudioHLE --> AudioBridge
+    end
