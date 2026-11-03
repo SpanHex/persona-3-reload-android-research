@@ -22,6 +22,8 @@ extern "C" {
 #define BBR_TRAP_UNSUPPORTED (1ULL << 63)
 #define BBR_TRAP_UNLIFTABLE  (1ULL << 62)
 #define BBR_TRAP_MISS        (1ULL << 61)
+#define BBR_TRAP_DIV_ZERO    (1ULL << 60)
+#define BBR_TRAP_OVERFLOW    (1ULL << 59)
 
 // Register Index Enumerations
 enum GuestGPR {
@@ -52,7 +54,7 @@ typedef union {
 } XMMReg;
 
 /*
- * Exact memory layout of GuestState (696 bytes)
+ * Exact memory layout of GuestState (720 bytes)
  * Aligned to 64 bytes.
  */
 typedef struct GuestState {
@@ -68,6 +70,9 @@ typedef struct GuestState {
     XMMReg   avx_high[16];  // Offset 0x1A8 (256B)
     uint64_t gs_base;       // Offset 0x2A8 (8B)
     uint64_t fs_base;       // Offset 0x2B0 (8B)
+    uint64_t mem_base;      // Offset 0x2B8 (8B)
+    uint64_t trap_code;     // Offset 0x2C0 (8B)
+    uint64_t exit_code;     // Offset 0x2C8 (8B)
 } __attribute__((aligned(64))) GuestState;
 
 // Recompiled Unit Function Pointer
@@ -79,7 +84,7 @@ typedef struct RecompUnit {
 } RecompUnit;
 
 // Runtime Public API
-void bbr_init_guest_state(GuestState* state, void* stack_base, size_t stack_size);
+void bbr_init_guest_state(GuestState* state, void* stack_base, size_t stack_size, uint64_t mem_base);
 void bbr_dispatch(GuestState* state, uint64_t target_vaddr);
 void bbr_trap(GuestState* state, uint64_t trap_code);
 bbr_func_t bbr_lookup(uint64_t vaddr);

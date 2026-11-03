@@ -24,7 +24,7 @@ class CodeGenerator:
     def __init__(self, target_cpu: str = "generic", opt_level: int = 2):
         self.target_triple = "aarch64-unknown-linux-android30"
         self.target_cpu = target_cpu
-        self.features = "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+        self.features = "+v8.2a,-lse,+crc,+fp-armv8,+neon"
         self.opt_level = opt_level
 
         # Create AArch64 TargetMachine

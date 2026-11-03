@@ -1,261 +1,168 @@
 {
-  "timestamp": "2026-11-02T19:55:26Z",
-  "test_suite_version": "1.0.0-phase3-poc",
+  "timestamp": "2026-11-03T18:41:19Z",
+  "test_suite_version": "2.0.0-phase3.1-authoritative",
   "target_hardware": {
     "device": "realme 12 Pro+",
     "soc": "Qualcomm Snapdragon 7s Gen 2 (SM7435-AB)",
     "cpu_architecture": "ARMv8.2-A (4x Cortex-A78 @ 2.40 GHz + 4x Cortex-A55 @ 1.95 GHz)",
     "gpu": "Qualcomm Adreno 710",
-    "page_size": "4KB (standard Android 14 Bionic)",
-    "adb_status": {
+    "page_size": "4KB",
+    "adb_status": "NOT_TESTED",
+    "adb_details": {
       "attached": false,
       "device_model": null,
-      "raw_output": "List of devices attached"
+      "raw_output": "List of devices attached",
+      "status": "NOT_TESTED"
     }
   },
-  "total_fixtures": 5,
-  "passed_fixtures": 5,
-  "all_passed": true,
+  "validation_summary": {
+    "total_fixtures": 5,
+    "compiled_count": 5,
+    "linked_count": 5,
+    "executed_count": 5,
+    "matched_count": 5,
+    "all_passed": true
+  },
   "fixtures": [
     {
       "fixture_id": "01_arithmetic",
-      "description": "Integer arithmetic, safe division, bitwise ops, recursion (factorial, fibonacci)",
-      "base_vaddr": "0x401000",
-      "expected_hex": "0x9e3779297ec9e89d",
-      "elf_validation": {
-        "valid": true,
-        "architecture": "ARCH.AARCH64",
-        "file_type": "FILE_TYPE.REL",
-        "size_bytes": 2448,
-        "has_text": true,
-        "sections": [
-          "",
-          ".strtab",
-          ".text",
-          ".rela.text",
-          ".note.GNU-stack",
-          ".eh_frame",
-          ".rela.eh_frame",
-          ".symtab"
-        ]
+      "description": "Integer arithmetic, high-byte registers (ah/ch/dh/bh), safe division, scalar floats, recursion (factorial, fibonacci)",
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
       },
-      "asm_validation": {
-        "valid": true,
-        "uses_x0_state": true,
-        "has_aapcs64_frame": true,
-        "preserves_stack": true,
-        "line_count": 320
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x2013d0",
+        "return_value_uint64": 14395263374464838504,
+        "return_value_hex": "0xc7c63fc50b2aeb68",
+        "execution_time_ms": 2.545
       },
-      "compilation_stats": {
-        "compiler_version": "1.0.0-phase3-poc",
-        "abi_version": 2,
-        "input_binary": "phase3-poc/tests/bin/01_arithmetic.bin",
-        "input_size_bytes": 312,
-        "discovered_functions": 4,
-        "total_x86_instructions": 107,
-        "discovery_time_ms": 1.895,
-        "lowering_time_ms": 8.636,
-        "codegen_time_ms": 112.975,
-        "total_time_ms": 125.439,
-        "throughput_insns_per_sec": 853.0,
-        "output_elf_size_bytes": 2448,
-        "target_triple": "aarch64-unknown-linux-android30",
-        "target_cpu": "generic",
-        "target_features": "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_2013d0",
+        "entry_addr": "0x5c04",
+        "return_value_uint64": 14395263374464838504,
+        "return_value_hex": "0xc7c63fc50b2aeb68",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 5.797
       },
-      "passed": true
+      "bit_exact_match": true
     },
     {
       "fixture_id": "02_dispatch",
       "description": "Direct calls, indirect function pointers, simulated C++ vtable dispatch, jump table switches",
-      "base_vaddr": "0x402000",
-      "expected_hex": "0xa32",
-      "elf_validation": {
-        "valid": true,
-        "architecture": "ARCH.AARCH64",
-        "file_type": "FILE_TYPE.REL",
-        "size_bytes": 2288,
-        "has_text": true,
-        "sections": [
-          "",
-          ".strtab",
-          ".text",
-          ".rela.text",
-          ".note.GNU-stack",
-          ".eh_frame",
-          ".rela.eh_frame",
-          ".symtab"
-        ]
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
       },
-      "asm_validation": {
-        "valid": true,
-        "uses_x0_state": true,
-        "has_aapcs64_frame": true,
-        "preserves_stack": true,
-        "line_count": 231
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x2012a0",
+        "return_value_uint64": 6965,
+        "return_value_hex": "0x1b35",
+        "execution_time_ms": 0.267
       },
-      "compilation_stats": {
-        "compiler_version": "1.0.0-phase3-poc",
-        "abi_version": 2,
-        "input_binary": "phase3-poc/tests/bin/02_dispatch.bin",
-        "input_size_bytes": 292,
-        "discovered_functions": 7,
-        "total_x86_instructions": 78,
-        "discovery_time_ms": 1.634,
-        "lowering_time_ms": 5.324,
-        "codegen_time_ms": 36.585,
-        "total_time_ms": 45.009,
-        "throughput_insns_per_sec": 1732.97,
-        "output_elf_size_bytes": 2288,
-        "target_triple": "aarch64-unknown-linux-android30",
-        "target_cpu": "generic",
-        "target_features": "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_2012a0",
+        "entry_addr": "0x5194",
+        "return_value_uint64": 6965,
+        "return_value_hex": "0x1b35",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.297
       },
-      "passed": true
+      "bit_exact_match": true
     },
     {
       "fixture_id": "03_memory_reloc",
       "description": "Global rodata/data access, struct traversal, pointer arithmetic, stack alignment",
-      "base_vaddr": "0x403000",
-      "expected_hex": "0x100005b34",
-      "elf_validation": {
-        "valid": true,
-        "architecture": "ARCH.AARCH64",
-        "file_type": "FILE_TYPE.REL",
-        "size_bytes": 1648,
-        "has_text": true,
-        "sections": [
-          "",
-          ".strtab",
-          ".text",
-          ".rela.text",
-          ".note.GNU-stack",
-          ".eh_frame",
-          ".rela.eh_frame",
-          ".symtab"
-        ]
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
       },
-      "asm_validation": {
-        "valid": true,
-        "uses_x0_state": true,
-        "has_aapcs64_frame": true,
-        "preserves_stack": true,
-        "line_count": 167
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x201340",
+        "return_value_uint64": 180287561799,
+        "return_value_hex": "0x29f9f9e047",
+        "execution_time_ms": 0.166
       },
-      "compilation_stats": {
-        "compiler_version": "1.0.0-phase3-poc",
-        "abi_version": 2,
-        "input_binary": "phase3-poc/tests/bin/03_memory_reloc.bin",
-        "input_size_bytes": 218,
-        "discovered_functions": 3,
-        "total_x86_instructions": 56,
-        "discovery_time_ms": 1.338,
-        "lowering_time_ms": 5.082,
-        "codegen_time_ms": 52.606,
-        "total_time_ms": 60.453,
-        "throughput_insns_per_sec": 926.34,
-        "output_elf_size_bytes": 1648,
-        "target_triple": "aarch64-unknown-linux-android30",
-        "target_cpu": "generic",
-        "target_features": "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_201340",
+        "entry_addr": "0x5574",
+        "return_value_uint64": 180287561799,
+        "return_value_hex": "0x29f9f9e047",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.031
       },
-      "passed": true
+      "bit_exact_match": true
     },
     {
       "fixture_id": "04_vector_simd",
       "description": "SSE/SSE2 packed float, packed int, and packed double vector operations",
-      "base_vaddr": "0x404000",
-      "expected_hex": "0x258",
-      "elf_validation": {
-        "valid": true,
-        "architecture": "ARCH.AARCH64",
-        "file_type": "FILE_TYPE.REL",
-        "size_bytes": 1512,
-        "has_text": true,
-        "sections": [
-          "",
-          ".strtab",
-          ".text",
-          ".rela.text",
-          ".note.GNU-stack",
-          ".eh_frame",
-          ".rela.eh_frame",
-          ".symtab"
-        ]
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
       },
-      "asm_validation": {
-        "valid": true,
-        "uses_x0_state": true,
-        "has_aapcs64_frame": true,
-        "preserves_stack": true,
-        "line_count": 112
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x2013a0",
+        "return_value_uint64": 1947358608,
+        "return_value_hex": "0x74125590",
+        "execution_time_ms": 0.461
       },
-      "compilation_stats": {
-        "compiler_version": "1.0.0-phase3-poc",
-        "abi_version": 2,
-        "input_binary": "phase3-poc/tests/bin/04_vector_simd.bin",
-        "input_size_bytes": 101,
-        "discovered_functions": 4,
-        "total_x86_instructions": 32,
-        "discovery_time_ms": 0.66,
-        "lowering_time_ms": 2.721,
-        "codegen_time_ms": 35.242,
-        "total_time_ms": 39.731,
-        "throughput_insns_per_sec": 805.42,
-        "output_elf_size_bytes": 1512,
-        "target_triple": "aarch64-unknown-linux-android30",
-        "target_cpu": "generic",
-        "target_features": "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_2013a0",
+        "entry_addr": "0x4db0",
+        "return_value_uint64": 1947358608,
+        "return_value_hex": "0x74125590",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.153
       },
-      "passed": true
+      "bit_exact_match": true
     },
     {
       "fixture_id": "05_control_concurrency",
-      "description": "Spin-wait volatile loop simulation, atomic fetch-and-add / compare-and-swap, nested error flow",
-      "base_vaddr": "0x405000",
-      "expected_hex": "0xe6",
-      "elf_validation": {
-        "valid": true,
-        "architecture": "ARCH.AARCH64",
-        "file_type": "FILE_TYPE.REL",
-        "size_bytes": 1600,
-        "has_text": true,
-        "sections": [
-          "",
-          ".strtab",
-          ".text",
-          ".rela.text",
-          ".note.GNU-stack",
-          ".eh_frame",
-          ".rela.eh_frame",
-          ".symtab"
-        ]
+      "description": "Spin-wait loop simulation, atomic fetch-and-add (xadd) / compare-and-swap (cmpxchg), condition flow",
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
       },
-      "asm_validation": {
-        "valid": true,
-        "uses_x0_state": true,
-        "has_aapcs64_frame": true,
-        "preserves_stack": true,
-        "line_count": 135
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x201260",
+        "return_value_uint64": 18446744073709550734,
+        "return_value_hex": "0xfffffffffffffc8e",
+        "execution_time_ms": 0.159
       },
-      "compilation_stats": {
-        "compiler_version": "1.0.0-phase3-poc",
-        "abi_version": 2,
-        "input_binary": "phase3-poc/tests/bin/05_control_concurrency.bin",
-        "input_size_bytes": 145,
-        "discovered_functions": 4,
-        "total_x86_instructions": 43,
-        "discovery_time_ms": 1.075,
-        "lowering_time_ms": 5.321,
-        "codegen_time_ms": 40.722,
-        "total_time_ms": 48.549,
-        "throughput_insns_per_sec": 885.7,
-        "output_elf_size_bytes": 1600,
-        "target_triple": "aarch64-unknown-linux-android30",
-        "target_cpu": "generic",
-        "target_features": "+v8.2a,+lse,+crc,+fp-armv8,+neon"
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_201260",
+        "entry_addr": "0x4cdc",
+        "return_value_uint64": 18446744073709550734,
+        "return_value_hex": "0xfffffffffffffc8e",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 0.803
       },
-      "passed": true
+      "bit_exact_match": true
     }
   ]
 }

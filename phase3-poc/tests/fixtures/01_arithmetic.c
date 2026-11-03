@@ -6,10 +6,12 @@
 #include <stddef.h>
 
 // 1. Basic Integer Arithmetic & Bitwise
+__attribute__((noinline))
 uint64_t test_integer_ops(int64_t a, int64_t b) {
     uint64_t sum = (uint64_t)(a + b);
     uint64_t diff = (uint64_t)(a - b);
     uint64_t prod = (uint64_t)(a * b);
+    
     // Safe division: guard against divide-by-zero
     uint64_t sdiv = b != 0 ? (uint64_t)(a / b) : 0;
     uint64_t udiv = (uint64_t)b != 0 ? ((uint64_t)a / (uint64_t)b) : 0;
@@ -33,7 +35,24 @@ uint64_t test_integer_ops(int64_t a, int64_t b) {
     return hash;
 }
 
-// 2. Scalar Floating Point Arithmetic (Float and Double)
+// 2. High-Byte Register Test (AH, CH, DH, BH)
+__attribute__((noinline))
+uint64_t test_high_bytes(uint64_t val) {
+    uint64_t r = val;
+    __asm__ volatile (
+        "movb $0x5A, %%ah\n\t"
+        "movb $0xA5, %%ch\n\t"
+        "movb $0x3C, %%dh\n\t"
+        "movb $0xC3, %%bh\n\t"
+        : "+a"(r)
+        :
+        : "rcx", "rdx", "rbx"
+    );
+    return r;
+}
+
+// 3. Scalar Floating Point Arithmetic (Float and Double)
+__attribute__((noinline))
 double test_float_ops(double x, double y) {
     double add = x + y;
     double sub = x - y;
@@ -47,13 +66,15 @@ double test_float_ops(double x, double y) {
     return (double)f_val + (double)f_mul + div;
 }
 
-// 3. Recursive Call Test (Factorial)
+// 4. Recursive Call Test (Factorial)
+__attribute__((noinline))
 uint64_t test_factorial(uint64_t n) {
     if (n <= 1) return 1;
     return n * test_factorial(n - 1);
 }
 
-// 4. Recursive Call Test (Fibonacci)
+// 5. Recursive Call Test (Fibonacci)
+__attribute__((noinline))
 uint64_t test_fibonacci(uint64_t n) {
     if (n == 0) return 0;
     if (n == 1) return 1;
@@ -63,10 +84,11 @@ uint64_t test_fibonacci(uint64_t n) {
 // Master Entrypoint for Fixture 01
 uint64_t run_fixture_01(void) {
     uint64_t r1 = test_integer_ops(42, 7);
-    double r2 = test_float_ops(100.5, 4.0);
-    uint64_t r3 = test_factorial(10);
-    uint64_t r4 = test_fibonacci(12);
+    uint64_t r2 = test_high_bytes(0x1122334455667788ULL);
+    double r3 = test_float_ops(100.5, 4.0);
+    uint64_t r4 = test_factorial(10);
+    uint64_t r5 = test_fibonacci(12);
     
-    uint64_t combined = r1 ^ (uint64_t)(r2 * 1000.0) ^ r3 ^ (r4 << 32);
+    uint64_t combined = r1 ^ r2 ^ (uint64_t)(r3 * 1000.0) ^ r4 ^ (r5 << 32);
     return combined;
 }

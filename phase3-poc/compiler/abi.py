@@ -39,18 +39,21 @@ class GuestState(ctypes.Structure):
     Aligned to 64 bytes.
     """
     _fields_ = [
-        ("gregs", ctypes.c_uint64 * 16),      # GPRs: RAX..R15
-        ("rip", ctypes.c_uint64),             # Guest instruction pointer
-        ("flags", ctypes.c_uint64),           # NZCV condition flags
-        ("pf_raw", ctypes.c_uint32),          # Parity flag raw
-        ("af_raw", ctypes.c_uint32),          # Aux carry flag raw
-        ("df_raw", ctypes.c_uint32),          # Direction flag raw
-        ("_pad0", ctypes.c_uint32),
-        ("_pad1", ctypes.c_uint64),           # Resume entry flag (GranularEntry)
-        ("xmm", XMMReg * 16),                 # 16 x 128-bit vector registers
-        ("avx_high", XMMReg * 16),            # 16 x 128-bit AVX upper halves
-        ("gs_base", ctypes.c_uint64),         # Thread-local storage (TLS) base
-        ("fs_base", ctypes.c_uint64),
+        ("gregs", ctypes.c_uint64 * 16),      # GPRs: RAX..R15 (0x000)
+        ("rip", ctypes.c_uint64),             # Guest instruction pointer (0x080)
+        ("flags", ctypes.c_uint64),           # NZCV / RFLAGS condition flags (0x088)
+        ("pf_raw", ctypes.c_uint32),          # Parity flag raw (0x090)
+        ("af_raw", ctypes.c_uint32),          # Aux carry flag raw (0x094)
+        ("df_raw", ctypes.c_uint32),          # Direction flag raw (0x098)
+        ("_pad0", ctypes.c_uint32),           # Alignment pad (0x09C)
+        ("resume_flag", ctypes.c_uint64),     # Resume entry flag (GranularEntry) (0x0A0)
+        ("xmm", XMMReg * 16),                 # 16 x 128-bit vector registers (0x0A8)
+        ("avx_high", XMMReg * 16),            # 16 x 128-bit AVX upper halves (0x1A8)
+        ("gs_base", ctypes.c_uint64),         # Thread-local storage (TLS) base (0x2A8)
+        ("fs_base", ctypes.c_uint64),         # FS base (0x2B0)
+        ("mem_base", ctypes.c_uint64),        # Guest-to-host memory translation base (0x2B8)
+        ("trap_code", ctypes.c_uint64),       # Reason code if execution traps (0x2C0)
+        ("exit_code", ctypes.c_uint64),       # Host exit / completion status (0x2C8)
     ]
 
 # ABI v2 Flags
@@ -64,3 +67,5 @@ BBR_FLAG_HOOK_SLOTS     = 1 << 3
 BBR_TRAP_UNSUPPORTED = 1 << 63
 BBR_TRAP_UNLIFTABLE  = 1 << 62
 BBR_TRAP_MISS        = 1 << 61
+BBR_TRAP_DIV_ZERO    = 1 << 60
+BBR_TRAP_OVERFLOW    = 1 << 59

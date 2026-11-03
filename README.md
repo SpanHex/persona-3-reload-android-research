@@ -1,13 +1,38 @@
 # Persona 3 Reload — PS4 to Android Technical Research & Architecture
 
-[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3-Research_%26_POC_Complete-success?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3_%26_3.1-Validation_Complete-success?style=for-the-badge)](#)
 [![Target](https://img.shields.io/badge/Target-Android_ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge)](#licensing--legal-compliance)
 [![Engine](https://img.shields.io/badge/Engine-Unreal_Engine_4.27-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white)](#)
 
-> **RESEARCH & PROOF-OF-CONCEPT DELIVERABLES (PHASES 1, 2 & 3):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, and empirical execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
+> **RESEARCH, PROOF-OF-CONCEPT & FUNCTIONAL VALIDATION (PHASES 1, 2, 3 & 3.1):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, and empirical differential execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
 > 
 > *Notice: This repository contains research documents, architecture maps, dependency matrices, proof-of-concept compilers, and system diagrams only. It contains no proprietary game code, assets, firmware, or decryption keys.*
+
+---
+
+## 🏆 PHASE 3.1: FUNCTIONAL VALIDATION, COMPILER CORRECTION & REAL ARM64 EXECUTION (COMPLETE)
+
+Phase 3.1 corrected the structural validation limitation of Phase 3, turning the AOT prototype into a genuinely executable, reproducible x86-64-to-ARM64 pipeline with **100% bit-exact differential execution across all authoritative C fixtures**:
+- **Execution Harness:** [`differential_runner.py`](phase3-poc/android-runtime/differential_runner.py) executes reference x86-64 ELFs in Unicorn x86-64, translates x86-64 machine code to AArch64 objects, links them into Bionic-compatible Android `.so` libraries with freestanding 128-bit math routines, and executes them in Unicorn ARM64 under AAPCS64 conventions.
+- **Differential Validation:** **5 / 5 Fixtures Passed Bit-Exact (100.0%)** across `COMPILED`, `LINKED`, `EXECUTED`, and `MATCHED` states.
+- **Bug Remediation:** Audited and resolved 10 critical bugs including condition flag SSA dominance violations, high-byte register isolation (`ah`/`ch`/`dh`/`bh`), shift count undefined behavior, freestanding 128-bit integer division (`__udivti3`/`__divti3`), intra-function jump table switches, atomic lock prefixes, SIMD vector instructions, and emulation LSE compatibility.
+- **Hardware Audit:** Target realme 12 Pro+ (Snapdragon 7s Gen 2 / Adreno 710) audited via ADB; device execution status honestly and strictly recorded as `NOT_TESTED` pending physical hardware connection.
+
+Phase 3.1 produced 10 dedicated technical reports located in [`documentation/PHASE_3_1/`](documentation/PHASE_3_1/):
+
+| Document | Report Title | Core Focus & Findings |
+|---|---|---|
+| [`P3R-DOC-P3.1-001`](documentation/PHASE_3_1/COMPILER_AND_RUNTIME_BUG_AUDIT.md) | **[Compiler & Runtime Bug Audit](documentation/PHASE_3_1/COMPILER_AND_RUNTIME_BUG_AUDIT.md)** | Detailed audit of the 10 compiler and runtime bugs discovered, root-caused, and resolved during differential validation. |
+| [`P3R-DOC-P3.1-002`](documentation/PHASE_3_1/CORRECTED_TEST_SUITE.md) | **[Corrected Test Suite](documentation/PHASE_3_1/CORRECTED_TEST_SUITE.md)** | Technical breakdown of the 5 authoritative C fixtures, anti-folding annotations, compiler flags, and measured ground truth. |
+| [`P3R-DOC-P3.1-003`](documentation/PHASE_3_1/DIFFERENTIAL_EXECUTION_RESULTS.md) | **[Differential Execution Results](documentation/PHASE_3_1/DIFFERENTIAL_EXECUTION_RESULTS.md)** | Comprehensive results matrix across `COMPILED`, `LINKED`, `EXECUTED`, and `MATCHED` states. 100% bit-exact values and timings. |
+| [`P3R-DOC-P3.1-004`](documentation/PHASE_3_1/ARM64_LINKING_AND_ANDROID_LOADING.md) | **[ARM64 Linking & Android Loading](documentation/PHASE_3_1/ARM64_LINKING_AND_ANDROID_LOADING.md)** | Technical analysis of LLVM LLD, `-Bsymbolic`, freestanding 128-bit division routines (`guest_cpu.c`), and Bionic constraints. |
+| [`P3R-DOC-P3.1-005`](documentation/PHASE_3_1/DISPATCH_AND_DISCOVERY_VALIDATION.md) | **[Dispatch & Discovery Validation](documentation/PHASE_3_1/DISPATCH_AND_DISCOVERY_VALIDATION.md)** | Global dispatch table (`bbr_lookup`), direct/indirect calls, vtable simulation, dense jump tables, and miss trap validation. |
+| [`P3R-DOC-P3.1-006`](documentation/PHASE_3_1/REALME_DEVICE_VALIDATION.md) | **[realme Device Validation Report](documentation/PHASE_3_1/REALME_DEVICE_VALIDATION.md)** | Snapdragon 7s Gen 2 / Adreno 710 hardware audit, ADB logs, explicit `NOT_TESTED` documentation, and on-device deployment protocol. |
+| [`P3R-DOC-P3.1-007`](documentation/PHASE_3_1/UPSTREAM_INTEGRATION_DECISION.md) | **[Upstream Integration Decision](documentation/PHASE_3_1/UPSTREAM_INTEGRATION_DECISION.md)** | Comparative evaluation of Options A, B, and C; specification of the Hybrid FEXCore Lifter + Recomp ABI v2 Architecture for UE4. |
+| [`P3R-DOC-P3.1-008`](documentation/PHASE_3_1/RISK_REGISTER.md) | **[Phase 3.1 Risk Register](documentation/PHASE_3_1/RISK_REGISTER.md)** | Updated risk analysis across compiler ISA coverage, thermal throttling, LMK memory pressure, and graphics translation. |
+| [`P3R-DOC-P3.1-009`](documentation/PHASE_3_1/PHASE_3_1_INDEX.md) | **[Phase 3.1 Master Index](documentation/PHASE_3_1/PHASE_3_1_INDEX.md)** | Complete artifact map, directory cross-references, and step-by-step reproduction instructions. |
+| [`P3R-DOC-P3.1-010`](documentation/PHASE_3_1/FINAL_VALIDATION_REPORT.md) | **[Final Validation Report](documentation/PHASE_3_1/FINAL_VALIDATION_REPORT.md)** | Comprehensive capstone report directly answering all 10 prompt research questions with the final **CONDITIONAL GO** verdict. |
 
 ---
 

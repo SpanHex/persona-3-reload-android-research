@@ -1,63 +1,60 @@
 {
-  "test_suite_version": "1.0.0-phase3-poc",
+  "test_suite_version": "2.0.0-phase3.1-authoritative",
   "target_guest_isa": "x86_64",
   "target_host_isa": "aarch64",
   "target_platform": "android-arm64",
   "abi_version": 2,
+  "oracle_source": "Unicorn Engine 2.1.4 x86-64 CPU Emulator (Direct ELF Execution)",
   "fixtures": [
     {
       "id": "01_arithmetic",
       "source": "phase3-poc/tests/fixtures/01_arithmetic.c",
-      "binary": "phase3-poc/tests/bin/01_arithmetic.bin",
-      "description": "Integer arithmetic, safe division, bitwise ops, recursion (factorial, fibonacci)",
-      "base_vaddr": "0x401000",
-      "entrypoint": "0x401000",
-      "expected_hex": "0x9e3779297ec9e89d",
-      "status": "VERIFIED_ORACLE"
+      "binary": "phase3-poc/tests/bin/01_arithmetic.elf",
+      "description": "Integer arithmetic, high-byte registers (ah/ch/dh/bh), safe division, scalar floats, recursion (factorial, fibonacci)",
+      "entrypoint_symbol": "run_fixture_01",
+      "expected_hex": "0xc7c63fc50b2aeb68",
+      "expected_uint64": 14395279621376994152,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     },
     {
       "id": "02_dispatch",
       "source": "phase3-poc/tests/fixtures/02_dispatch.c",
-      "binary": "phase3-poc/tests/bin/02_dispatch.bin",
-      "extra_entries": "phase3-poc/tests/fixtures/02_extra_entries.txt",
+      "binary": "phase3-poc/tests/bin/02_dispatch.elf",
       "description": "Direct calls, indirect function pointers, simulated C++ vtable dispatch, jump table switches",
-      "base_vaddr": "0x402000",
-      "entrypoint": "0x402000",
-      "expected_hex": "0xa32",
-      "expected_decimal": 2610,
-      "status": "VERIFIED_ORACLE"
+      "entrypoint_symbol": "run_fixture_02",
+      "expected_hex": "0x1b35",
+      "expected_uint64": 6965,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     },
     {
       "id": "03_memory_reloc",
       "source": "phase3-poc/tests/fixtures/03_memory_reloc.c",
-      "binary": "phase3-poc/tests/bin/03_memory_reloc.bin",
+      "binary": "phase3-poc/tests/bin/03_memory_reloc.elf",
       "description": "Global rodata/data access, struct traversal, pointer arithmetic, stack alignment",
-      "base_vaddr": "0x403000",
-      "entrypoint": "0x403000",
-      "expected_hex": "0x100005b34",
-      "status": "VERIFIED_ORACLE"
+      "entrypoint_symbol": "run_fixture_03",
+      "expected_hex": "0x29f9f9e047",
+      "expected_uint64": 180287758407,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     },
     {
       "id": "04_vector_simd",
       "source": "phase3-poc/tests/fixtures/04_vector_simd.c",
-      "binary": "phase3-poc/tests/bin/04_vector_simd.bin",
+      "binary": "phase3-poc/tests/bin/04_vector_simd.elf",
       "description": "SSE/SSE2 packed float, packed int, and packed double vector operations",
-      "base_vaddr": "0x404000",
-      "entrypoint": "0x404000",
-      "expected_hex": "0x258",
-      "expected_decimal": 600,
-      "status": "VERIFIED_ORACLE"
+      "entrypoint_symbol": "run_fixture_04",
+      "expected_hex": "0x74125590",
+      "expected_uint64": 1947350416,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     },
     {
       "id": "05_control_concurrency",
       "source": "phase3-poc/tests/fixtures/05_control_concurrency.c",
-      "binary": "phase3-poc/tests/bin/05_control_concurrency.bin",
-      "description": "Spin-wait volatile loop simulation, atomic fetch-and-add / compare-and-swap, nested error flow",
-      "base_vaddr": "0x405000",
-      "entrypoint": "0x405000",
-      "expected_hex": "0xe6",
-      "expected_decimal": 230,
-      "status": "VERIFIED_ORACLE"
+      "binary": "phase3-poc/tests/bin/05_control_concurrency.elf",
+      "description": "Spin-wait loop simulation, atomic fetch-and-add (xadd) / compare-and-swap (cmpxchg), condition flow",
+      "entrypoint_symbol": "run_fixture_05",
+      "expected_hex": "0xfffffffffffffc8e",
+      "expected_uint64": 18446744073709550734,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     }
   ]
 }

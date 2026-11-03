@@ -20,17 +20,18 @@ import json
 import argparse
 import capstone
 import llvmlite.ir as ir
+import lief
 
 from abi import BBR_ABI_VERSION, GuestState
-from discover import DiscoveryEngine
+from discover import DiscoveryEngine, Function
 from lower import FunctionLifter
 from codegen import CodeGenerator
 
 def main():
     parser = argparse.ArgumentParser(description="P3R AOT Recompiler Driver")
-    parser.add_argument("--input", required=True, help="Path to input x86-64 binary")
-    parser.add_argument("--base-vaddr", default="0x401000", help="Base virtual address (hex)")
-    parser.add_argument("--entry", default="0x401000", help="Entrypoint virtual address (hex)")
+    parser.add_argument("--input", required=True, help="Path to input x86-64 binary or ELF")
+    parser.add_argument("--base-vaddr", default=None, help="Base virtual address (hex)")
+    parser.add_argument("--entry", default=None, help="Entrypoint virtual address (hex)")
     parser.add_argument("--extra-entries", default=None, help="Path to extra entries file")
     parser.add_argument("--out-asm", default=None, help="Path to output AArch64 assembly (.s)")
     parser.add_argument("--out-obj", default=None, help="Path to output AArch64 ELF object (.o)")
@@ -40,19 +41,39 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Enable verbose debug logs")
 
     args = parser.parse_args()
-
     start_time = time.perf_counter()
-    base_vaddr = int(args.base_vaddr, 16)
-    entry_vaddr = int(args.entry, 16)
 
     if not os.path.exists(args.input):
         print(f"[-] Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
 
     with open(args.input, "rb") as f:
-        code_bytes = f.read()
+        file_header = f.read(4)
 
-    print(f"[*] Loaded input: {args.input} ({len(code_bytes)} bytes, base: {hex(base_vaddr)})")
+    is_elf = (file_header == b"\x7fELF")
+    known_symbols = {}
+
+    if is_elf:
+        elf = lief.parse(args.input)
+        text_sec = elf.get_section(".text")
+        if not text_sec:
+            print("[-] No .text section found in ELF file", file=sys.stderr)
+            sys.exit(1)
+        base_vaddr = text_sec.virtual_address if args.base_vaddr is None else int(args.base_vaddr, 16)
+        entry_vaddr = elf.header.entrypoint if args.entry is None else int(args.entry, 16)
+        code_bytes = bytes(text_sec.content)
+
+        # Collect function entrypoints from ELF symbol table
+        for sym in elf.symbols:
+            if sym.type.name == "FUNC" and sym.value != 0:
+                known_symbols[sym.value] = sym.name
+        print(f"[*] Loaded ELF input: {args.input} (text: {len(code_bytes)} bytes @ {hex(base_vaddr)}, entry: {hex(entry_vaddr)})")
+    else:
+        with open(args.input, "rb") as f:
+            code_bytes = f.read()
+        base_vaddr = int(args.base_vaddr, 16) if args.base_vaddr else 0x401000
+        entry_vaddr = int(args.entry, 16) if args.entry else 0x401000
+        print(f"[*] Loaded raw binary input: {args.input} ({len(code_bytes)} bytes, base: {hex(base_vaddr)}, entry: {hex(entry_vaddr)})")
 
     # 1. Discovery Phase
     discovery = DiscoveryEngine()
@@ -60,8 +81,13 @@ def main():
         discovery.load_extra_entries_file(args.extra_entries)
         print(f"[*] Loaded {len(discovery.extra_entries)} extra entrypoints from {args.extra_entries}")
 
+    # Add symbols as extra entries
+    for sym_vaddr in known_symbols:
+        discovery.extra_entries.add(sym_vaddr)
+
     disc_start = time.perf_counter()
-    functions = discovery.discover_from_code(code_bytes, base_vaddr, [entry_vaddr])
+    entries_to_probe = [entry_vaddr] + list(known_symbols.keys())
+    functions = discovery.discover_from_code(code_bytes, base_vaddr, entries_to_probe)
     disc_time = time.perf_counter() - disc_start
     print(f"[+] Discovery completed in {disc_time*1000:.2f} ms: found {len(functions)} functions")
 
@@ -79,6 +105,8 @@ def main():
     for fn_addr in discovered_addrs:
         fn_meta = functions[fn_addr]
         fn_offset = fn_addr - base_vaddr
+        if fn_offset < 0 or fn_offset >= len(code_bytes):
+            continue
         fn_len = fn_meta.end - fn_addr if fn_meta.end > fn_addr else len(code_bytes) - fn_offset
         fn_bytes = code_bytes[fn_offset:fn_offset + fn_len]
 
@@ -125,9 +153,10 @@ def main():
 
     # 4. Statistics Output
     stats = {
-        "compiler_version": "1.0.0-phase3-poc",
+        "compiler_version": "2.0.0-phase3.1",
         "abi_version": BBR_ABI_VERSION,
         "input_binary": args.input,
+        "input_is_elf": is_elf,
         "input_size_bytes": len(code_bytes),
         "discovered_functions": len(discovered_addrs),
         "total_x86_instructions": total_insns,

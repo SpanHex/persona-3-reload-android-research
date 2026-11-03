@@ -5,15 +5,23 @@
 #include <stdint.h>
 
 // Direct Callee Functions
+__attribute__((noinline))
 uint64_t target_func_add(uint64_t a, uint64_t b) { return a + b; }
+
+__attribute__((noinline))
 uint64_t target_func_sub(uint64_t a, uint64_t b) { return a - b; }
+
+__attribute__((noinline))
 uint64_t target_func_mul(uint64_t a, uint64_t b) { return a * b; }
+
+__attribute__((noinline))
 uint64_t target_func_xor(uint64_t a, uint64_t b) { return a ^ b; }
 
 // Function Pointer Type
 typedef uint64_t (*math_fn_t)(uint64_t, uint64_t);
 
 // 1. Indirect Call through Function Pointer
+__attribute__((noinline))
 uint64_t test_indirect_call(math_fn_t fn, uint64_t x, uint64_t y) {
     return fn(x, y);
 }
@@ -34,14 +42,19 @@ typedef struct ObjectB {
     uint64_t multiplier;
 } ObjectB;
 
+__attribute__((noinline))
 static uint64_t objA_op1(void* self, uint64_t v) { return ((ObjectA*)self)->base_val + v; }
+__attribute__((noinline))
 static uint64_t objA_op2(void* self, uint64_t v) { return ((ObjectA*)self)->base_val - v; }
+__attribute__((noinline))
 static uint64_t objB_op1(void* self, uint64_t v) { return ((ObjectB*)self)->multiplier * v; }
+__attribute__((noinline))
 static uint64_t objB_op2(void* self, uint64_t v) { return ((ObjectB*)self)->multiplier ^ v; }
 
 static const VTable vtable_A = { objA_op1, objA_op2 };
 static const VTable vtable_B = { objB_op1, objB_op2 };
 
+__attribute__((noinline))
 uint64_t test_vtable_dispatch(int type, uint64_t val) {
     ObjectA a = { &vtable_A, 500 };
     ObjectB b = { &vtable_B, 3 };
@@ -53,7 +66,8 @@ uint64_t test_vtable_dispatch(int type, uint64_t val) {
     }
 }
 
-// 3. Jump Table / Switch Statement (dense switch lowering to jmp [rip + reg*8])
+// 3. Jump Table / Switch Statement (dense switch lowering to jmp [table + reg*8])
+__attribute__((noinline))
 uint64_t test_switch_jumptable(int selector, uint64_t val) {
     uint64_t out = 0;
     switch (selector) {
@@ -79,10 +93,13 @@ uint64_t run_fixture_02(void) {
         target_func_xor
     };
     
+    // Use volatile pointer to prevent compiler from constant-folding or devirtualizing
+    math_fn_t volatile* v_table = fn_table;
+    
     uint64_t acc = 0;
     // Test all indirect calls
     for (int i = 0; i < 4; i++) {
-        acc += test_indirect_call(fn_table[i], 100, (uint64_t)(i + 1));
+        acc += test_indirect_call(v_table[i], 100, (uint64_t)(i + 1));
     }
     
     // Test VTable dispatch

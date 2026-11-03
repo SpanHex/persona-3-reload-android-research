@@ -27,13 +27,14 @@ typedef struct Node {
 } Node;
 
 // Pointer arithmetic and structure traversal
+__attribute__((noinline))
 uint64_t test_struct_traversal(void) {
     Node n3 = { 3, 0x03, 0xAA, 0, 3000, NULL };
     Node n2 = { 2, 0x02, 0xBB, 0, 2000, &n3 };
     Node n1 = { 1, 0x01, 0xCC, 0, 1000, &n2 };
     
     uint64_t sum = 0;
-    Node* cur = &n1;
+    Node* volatile cur = &n1;
     while (cur != NULL) {
         sum += cur->value;
         sum += cur->id;
@@ -44,6 +45,7 @@ uint64_t test_struct_traversal(void) {
 }
 
 // Global Relocations & Buffer Manipulation
+__attribute__((noinline))
 uint64_t test_global_access(uint64_t input) {
     g_data_counter += input;
     
@@ -59,6 +61,7 @@ uint64_t test_global_access(uint64_t input) {
 }
 
 // Stack Array & Alignment Test
+__attribute__((noinline))
 uint64_t test_stack_frame_alignment(uint64_t salt) {
     uint64_t local_arr[32];
     for (int i = 0; i < 32; i++) {
