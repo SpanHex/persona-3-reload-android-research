@@ -107,3 +107,4 @@ adb shell "cat /sys/class/thermal/thermal_zone*/temp"
 ## Summary Status
 
 The compilation pipeline produces AArch64 binaries that conform to Android API 30+ specifications, Position-Independent Code (`-fPIC`), and AAPCS64 conventions. The pipeline is fully prepared for physical execution as soon as hardware is attached.
+

@@ -73,3 +73,4 @@ This Risk Register identifies the critical technical risks, scores their probabi
   1. The project distributes **only open-source compiler tooling and compatibility runtime code**.
   2. All commercial game data, executables (`eboot.bin`), and asset archives (`*.cpk`, `*.pak`) must be legitimately obtained and decrypted by the end user from their own legally purchased PS4 retail copy.
   3. No proprietary console firmware keys, certificates, or assets shall ever be hosted in the repository.
+

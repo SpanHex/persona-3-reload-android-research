@@ -176,3 +176,4 @@ Every bug was isolated, root-caused, corrected, and verified across all test fix
 | 8 | Atomics | `lock` prefix unliftable trap | RESOLVED | `05_control_concurrency` (atomic RMW) |
 | 9 | Target Machine | `casal` LSE illegal instruction | RESOLVED | `codegen.py` (`-lse` flag) |
 | 10 | SIMD Engine | Unliftable vector opcode traps | RESOLVED | `04_vector_simd` (14 vector instructions) |
+

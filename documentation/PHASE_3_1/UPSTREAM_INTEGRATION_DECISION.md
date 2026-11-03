@@ -114,3 +114,4 @@ The project shall adopt a **Hybrid Architecture** combining the best aspects of 
 1. **Frontend:** Adopt the FEXCore instruction lifting frontend for industrial-strength x86-64 decoding, condition code flag optimization, and AVX/SSE vector coverage.
 2. **Backend:** Retain the LLVM code generator configured with Phase 3.1's verified AAPCS64 conventions (`-target aarch64-linux-android30`, `-fPIC`, `-Wl,-Bsymbolic`).
 3. **Runtime:** Retain Phase 3.1's Recomp ABI v2 `GuestState` layout, freestanding math libraries (`guest_cpu.c`), and memory address translation layer (`mem_base`).
+

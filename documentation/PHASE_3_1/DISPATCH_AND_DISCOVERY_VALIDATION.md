@@ -158,3 +158,4 @@ To verify this behavior, an intentional miss was tested:
 5. The execution terminated cleanly without memory corruption or segmentation faults.
 
 This confirms that the dispatch subsystem provides safe error containment for unanticipated dynamic branches.
+

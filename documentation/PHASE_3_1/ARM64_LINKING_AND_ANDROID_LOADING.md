@@ -170,3 +170,4 @@ entry_func(&guest_state);
 ```
 
 This guarantees seamless integration with standard Android NDK game frameworks.
+

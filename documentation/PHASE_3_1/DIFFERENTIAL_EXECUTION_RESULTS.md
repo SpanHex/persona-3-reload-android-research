@@ -91,3 +91,4 @@ All tests were timed using high-resolution performance counters (`time.perf_coun
 ## Conclusion
 
 The transition from Phase 3's structural string-checking to Phase 3.1's differential execution pipeline successfully exposed and eliminated all translation discrepancies. The recompiler has proven capable of emitting fully functional, bit-exact native AArch64 code from synthetic x86-64 input.
+
