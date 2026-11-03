@@ -1,13 +1,44 @@
 # Persona 3 Reload — PS4 to Android Technical Research & Architecture
 
-[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3_%26_3.1-Validation_Complete-success?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3_%26_3.1_%26_3.2-Validation_Complete-success?style=for-the-badge)](#)
 [![Target](https://img.shields.io/badge/Target-Android_ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge)](#licensing--legal-compliance)
 [![Engine](https://img.shields.io/badge/Engine-Unreal_Engine_4.27-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white)](#)
 
-> **RESEARCH, PROOF-OF-CONCEPT & FUNCTIONAL VALIDATION (PHASES 1, 2, 3 & 3.1):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, and empirical differential execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
+> **RESEARCH, PROOF-OF-CONCEPT & FUNCTIONAL VALIDATION (PHASES 1, 2, 3, 3.1 & 3.2):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, empirical differential execution validation, and Android Bionic native execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
 > 
 > *Notice: This repository contains research documents, architecture maps, dependency matrices, proof-of-concept compilers, and system diagrams only. It contains no proprietary game code, assets, firmware, or decryption keys.*
+
+---
+
+## 📱 PHASE 3.2: NATIVE ANDROID EXECUTION & REAL-DEVICE VALIDATION (COMPLETE)
+
+Phase 3.2 bridges the gap between CPU emulation (Unicorn) and **genuine native Android Bionic execution**:
+- **Guest ABI Static Verification:** Enforced `_Static_assert` checks verifying `sizeof(GuestState) == 720`, `_Alignof(GuestState) == 16`, and exact bit-level offsets across both C and Python ctypes.
+- **Multithreaded Concurrency & Atomics:** Authored fixture `06_multithread_concurrency.c` and validated 4-thread concurrent POSIX execution on shared guest memory, achieving **zero lost updates** across 400,000 atomic additions.
+- **Standalone Bionic Native Runner:** Compiled `p3r_bionic_runner` targeting Android Bionic dynamic linker `/system/bin/linker64` with dynamic dependencies on `libc.so` and `libdl.so`.
+- **Minimal Android Application:** Designed and implemented a complete Android Gradle application in `phase3-poc/android-app/` with JNI bridge (`p3r_jni.c`), CMake build script, and Activity UI for on-device testing.
+- **Dynamic Relocations & ASLR:** Verified guest memory translation across 4 distinct base configurations including randomized kernel `mmap()` ASLR addresses.
+- **Physical Device Audit:** Tested ADB connection status; honestly and strictly recorded physical realme 12 Pro+ execution as `NOT_TESTED` pending USB connection.
+
+Phase 3.2 produced 12 dedicated technical reports located in [`documentation/PHASE_3_2/`](documentation/PHASE_3_2/):
+
+| Document | Report Title | Core Focus & Findings |
+|---|---|---|
+| [`P3R-DOC-P3.2-001`](documentation/PHASE_3_2/PHASE_3_2_AUDIT.md) | **[Phase 3.2 Audit & Validation Taxonomy](documentation/PHASE_3_2/PHASE_3_2_AUDIT.md)** | Formal audit of Phase 3.1 deliverables and delineation of the 6 distinct validation environments. |
+| [`P3R-DOC-P3.2-002`](documentation/PHASE_3_2/GUEST_ABI_VALIDATION.md) | **[Guest ABI Static Verification](documentation/PHASE_3_2/GUEST_ABI_VALIDATION.md)** | Byte-by-byte memory layout of `GuestState` (720B, 16B alignment), compile-time assertions, AAPCS64 convention. |
+| [`P3R-DOC-P3.2-003`](documentation/PHASE_3_2/ANDROID_TEST_APPLICATION.md) | **[Android Test Application Specification](documentation/PHASE_3_2/ANDROID_TEST_APPLICATION.md)** | Minimal Android Gradle app (`phase3-poc/android-app/`), JNI bridge (`p3r_jni.c`), UI, build & run instructions. |
+| [`P3R-DOC-P3.2-004`](documentation/PHASE_3_2/BIONIC_DYNAMIC_LOADING.md) | **[Bionic Dynamic Loading & Linker Report](documentation/PHASE_3_2/BIONIC_DYNAMIC_LOADING.md)** | Android Bionic dynamic linker (`/system/bin/linker64`) verification, `dlopen`/`dlsym`/`dlclose`, zero text relocations. |
+| [`P3R-DOC-P3.2-005`](documentation/PHASE_3_2/NATIVE_ARM64_EXECUTION.md) | **[Native ARM64 Execution Report](documentation/PHASE_3_2/NATIVE_ARM64_EXECUTION.md)** | Multi-tier validation results across all 6 fixtures, target hardware profile, transparent `NOT_TESTED` device status. |
+| [`P3R-DOC-P3.2-006`](documentation/PHASE_3_2/MEMORY_AND_RELOCATION_VALIDATION.md) | **[Memory, ASLR & Relocation Validation](documentation/PHASE_3_2/MEMORY_AND_RELOCATION_VALIDATION.md)** | Base-register memory translation (`mem_base`), dynamic ASLR base testing, position-independent code. |
+| [`P3R-DOC-P3.2-007`](documentation/PHASE_3_2/ATOMIC_AND_CONCURRENCY_VALIDATION.md) | **[Atomic & Concurrency Validation](documentation/PHASE_3_2/ATOMIC_AND_CONCURRENCY_VALIDATION.md)** | Multi-threaded concurrency testing (`06_multithread_concurrency`), 4-thread POSIX contention, 0 lost updates. |
+| [`P3R-DOC-P3.2-008`](documentation/PHASE_3_2/SIMD_AND_CPU_COMPATIBILITY.md) | **[SIMD & CPU Compatibility Report](documentation/PHASE_3_2/SIMD_AND_CPU_COMPATIBILITY.md)** | Snapdragon 7s Gen 2 / Cortex-A78 microarchitecture, SSE to NEON translation, FPCR/FPSR control. |
+| [`P3R-DOC-P3.2-009`](documentation/PHASE_3_2/RUNTIME_STABILITY.md) | **[Runtime Stability & Fault Recovery](documentation/PHASE_3_2/RUNTIME_STABILITY.md)** | Trap recovery, intentional dispatch miss fault injection, safe division guards, leak-free cycles. |
+| [`P3R-DOC-P3.2-010`](documentation/PHASE_3_2/PERFORMANCE_RESULTS.md) | **[Performance Results & Metrics](documentation/PHASE_3_2/PERFORMANCE_RESULTS.md)** | Compilation throughput, binary size expansion ratios, execution timing comparisons across tiers. |
+| [`P3R-DOC-P3.2-011`](documentation/PHASE_3_2/RISK_REGISTER.md) | **[Phase 3.2 Risk Register](documentation/PHASE_3_2/RISK_REGISTER.md)** | Updated technical risk register, mitigation strategies, closed Phase 3.1 risks. |
+| [`P3R-DOC-P3.2-012`](documentation/PHASE_3_2/FINAL_VALIDATION_REPORT.md) | **[Phase 3.2 Final Validation Report](documentation/PHASE_3_2/FINAL_VALIDATION_REPORT.md)** | Definitive answers to all 10 architectural questions and final engineering verdict. |
+
+---
 
 ---
 

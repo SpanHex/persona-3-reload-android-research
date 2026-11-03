@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">P3R AOT Validator</string>
+    <string name="title_text">Persona 3 Reload — ARM64 AOT Runtime</string>
+    <string name="subtitle_text">Native Android Bionic Validation Harness</string>
+    <string name="btn_run_tests">Run Native AOT Validation</string>
+    <string name="status_ready">Status: Ready to execute</string>
+</resources>

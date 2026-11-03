@@ -22,12 +22,13 @@ FIXTURE_NAMES = [
     "02_dispatch",
     "03_memory_reloc",
     "04_vector_simd",
-    "05_control_concurrency"
+    "05_control_concurrency",
+    "06_multithread_concurrency"
 ]
 
 def recompile_and_link():
     print("=" * 75)
-    print("RECOMPILING AND LINKING ALL 5 FIXTURES FOR REAL ARM64 EXECUTION")
+    print("RECOMPILING AND LINKING ALL FIXTURES FOR REAL ARM64 EXECUTION")
     print("=" * 75)
 
     # 1. Compile freestanding guest_cpu.o runtime

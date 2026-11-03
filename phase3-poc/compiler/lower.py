@@ -379,8 +379,8 @@ class FunctionLifter:
             ops = insn.operands
             next_addr = instructions[i + 1].address if i + 1 < len(instructions) else None
 
-            # Skip NOPs
-            if m.startswith("nop"):
+            # Skip NOPs and spin hints
+            if m.startswith("nop") or m == "pause":
                 pass
 
             # 1. MOV / MOVZX / MOVSX / MOVSXD
@@ -1059,6 +1059,29 @@ class FunctionLifter:
                 builder.store(ir.Constant(self.i1, 0), self.ptr_cf)
                 builder.store(ir.Constant(self.i1, 0), self.ptr_of)
                 self._sync_flags_to_state(builder)
+
+            elif m == "xchg":
+                if ops[0].type == capstone.x86.X86_OP_MEM:
+                    vaddr = self._resolve_mem_addr(builder, ops[0], insn.address, insn.size)
+                    width = ops[0].size * 8
+                    op_type = ir.IntType(width)
+                    ptr = self._get_host_ptr(builder, vaddr, op_type)
+                    reg_val = self._load_operand(builder, insn, ops[1], target_type=op_type)
+                    old_mem = builder.atomic_rmw("xchg", ptr, reg_val, ordering="seq_cst")
+                    self._store_operand(builder, insn, ops[1], old_mem)
+                elif ops[1].type == capstone.x86.X86_OP_MEM:
+                    vaddr = self._resolve_mem_addr(builder, ops[1], insn.address, insn.size)
+                    width = ops[1].size * 8
+                    op_type = ir.IntType(width)
+                    ptr = self._get_host_ptr(builder, vaddr, op_type)
+                    reg_val = self._load_operand(builder, insn, ops[0], target_type=op_type)
+                    old_mem = builder.atomic_rmw("xchg", ptr, reg_val, ordering="seq_cst")
+                    self._store_operand(builder, insn, ops[0], old_mem)
+                else:
+                    val0 = self._load_operand(builder, insn, ops[0])
+                    val1 = self._load_operand(builder, insn, ops[1], target_type=val0.type)
+                    self._store_operand(builder, insn, ops[0], val1)
+                    self._store_operand(builder, insn, ops[1], val0)
 
             else:
                 builder.call(self.trap_fn, [self.state_arg, ir.Constant(self.i64, BBR_TRAP_UNLIFTABLE)])

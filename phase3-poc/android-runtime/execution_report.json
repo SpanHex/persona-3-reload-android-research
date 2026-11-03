@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-03T18:41:19Z",
+  "timestamp": "2026-11-03T19:37:44Z",
   "test_suite_version": "2.0.0-phase3.1-authoritative",
   "target_hardware": {
     "device": "realme 12 Pro+",
@@ -16,11 +16,11 @@
     }
   },
   "validation_summary": {
-    "total_fixtures": 5,
-    "compiled_count": 5,
-    "linked_count": 5,
-    "executed_count": 5,
-    "matched_count": 5,
+    "total_fixtures": 6,
+    "compiled_count": 6,
+    "linked_count": 6,
+    "executed_count": 6,
+    "matched_count": 6,
     "all_passed": true
   },
   "fixtures": [
@@ -38,7 +38,7 @@
         "entrypoint": "0x2013d0",
         "return_value_uint64": 14395263374464838504,
         "return_value_hex": "0xc7c63fc50b2aeb68",
-        "execution_time_ms": 2.545
+        "execution_time_ms": 2.424
       },
       "arm64_translated": {
         "success": true,
@@ -48,7 +48,7 @@
         "return_value_hex": "0xc7c63fc50b2aeb68",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 5.797
+        "execution_time_ms": 5.218
       },
       "bit_exact_match": true
     },
@@ -66,7 +66,7 @@
         "entrypoint": "0x2012a0",
         "return_value_uint64": 6965,
         "return_value_hex": "0x1b35",
-        "execution_time_ms": 0.267
+        "execution_time_ms": 0.235
       },
       "arm64_translated": {
         "success": true,
@@ -76,7 +76,7 @@
         "return_value_hex": "0x1b35",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.297
+        "execution_time_ms": 1.176
       },
       "bit_exact_match": true
     },
@@ -94,7 +94,7 @@
         "entrypoint": "0x201340",
         "return_value_uint64": 180287561799,
         "return_value_hex": "0x29f9f9e047",
-        "execution_time_ms": 0.166
+        "execution_time_ms": 0.157
       },
       "arm64_translated": {
         "success": true,
@@ -104,7 +104,7 @@
         "return_value_hex": "0x29f9f9e047",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.031
+        "execution_time_ms": 1.023
       },
       "bit_exact_match": true
     },
@@ -122,7 +122,7 @@
         "entrypoint": "0x2013a0",
         "return_value_uint64": 1947358608,
         "return_value_hex": "0x74125590",
-        "execution_time_ms": 0.461
+        "execution_time_ms": 0.385
       },
       "arm64_translated": {
         "success": true,
@@ -132,7 +132,7 @@
         "return_value_hex": "0x74125590",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.153
+        "execution_time_ms": 1.412
       },
       "bit_exact_match": true
     },
@@ -150,7 +150,7 @@
         "entrypoint": "0x201260",
         "return_value_uint64": 18446744073709550734,
         "return_value_hex": "0xfffffffffffffc8e",
-        "execution_time_ms": 0.159
+        "execution_time_ms": 0.152
       },
       "arm64_translated": {
         "success": true,
@@ -160,7 +160,35 @@
         "return_value_hex": "0xfffffffffffffc8e",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 0.803
+        "execution_time_ms": 0.748
+      },
+      "bit_exact_match": true
+    },
+    {
+      "fixture_id": "06_multithread_concurrency",
+      "description": "Multi-threaded concurrency, atomic xadd, atomic cmpxchg loop, spinlock test-and-set xchgl",
+      "states": {
+        "COMPILED": true,
+        "LINKED": true,
+        "EXECUTED": true,
+        "MATCHED": true
+      },
+      "x86_64_reference": {
+        "success": true,
+        "entrypoint": "0x201300",
+        "return_value_uint64": 859025102792,
+        "return_value_hex": "0xc801e2d7c8",
+        "execution_time_ms": 0.316
+      },
+      "arm64_translated": {
+        "success": true,
+        "entry_function": "bbr_201300",
+        "entry_addr": "0x5098",
+        "return_value_uint64": 859025102792,
+        "return_value_hex": "0xc801e2d7c8",
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.761
       },
       "bit_exact_match": true
     }

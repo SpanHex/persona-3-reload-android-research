@@ -55,6 +55,16 @@
       "expected_hex": "0xfffffffffffffc8e",
       "expected_uint64": 18446744073709550734,
       "status": "AUTHORITATIVE_ORACLE_VERIFIED"
+    },
+    {
+      "id": "06_multithread_concurrency",
+      "source": "phase3-poc/tests/fixtures/06_multithread_concurrency.c",
+      "binary": "phase3-poc/tests/bin/06_multithread_concurrency.elf",
+      "description": "Multi-threaded concurrency, atomic xadd, atomic cmpxchg loop, spinlock test-and-set xchgl",
+      "entrypoint_symbol": "run_fixture_06",
+      "expected_hex": "0xc801e2d7c8",
+      "expected_uint64": 859025102792,
+      "status": "AUTHORITATIVE_ORACLE_VERIFIED"
     }
   ]
 }

@@ -55,7 +55,7 @@ typedef union {
 
 /*
  * Exact memory layout of GuestState (720 bytes)
- * Aligned to 64 bytes.
+ * Aligned to 16 bytes (natural alignment for 128-bit vector registers).
  */
 typedef struct GuestState {
     uint64_t gregs[16];     // Offset 0x000 (128B)
@@ -73,7 +73,28 @@ typedef struct GuestState {
     uint64_t mem_base;      // Offset 0x2B8 (8B)
     uint64_t trap_code;     // Offset 0x2C0 (8B)
     uint64_t exit_code;     // Offset 0x2C8 (8B)
-} __attribute__((aligned(64))) GuestState;
+} __attribute__((aligned(16))) GuestState;
+
+// Compile-time static verification of binary layout & offsets (Milestone 5)
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || defined(__clang__) || defined(__GNUC__)
+_Static_assert(sizeof(GuestState) == 720, "GuestState size must be exactly 720 bytes");
+_Static_assert(offsetof(GuestState, gregs) == 0, "GuestState::gregs offset mismatch");
+_Static_assert(offsetof(GuestState, rip) == 128, "GuestState::rip offset mismatch");
+_Static_assert(offsetof(GuestState, flags) == 136, "GuestState::flags offset mismatch");
+_Static_assert(offsetof(GuestState, pf_raw) == 144, "GuestState::pf_raw offset mismatch");
+_Static_assert(offsetof(GuestState, af_raw) == 148, "GuestState::af_raw offset mismatch");
+_Static_assert(offsetof(GuestState, df_raw) == 152, "GuestState::df_raw offset mismatch");
+_Static_assert(offsetof(GuestState, _pad0) == 156, "GuestState::_pad0 offset mismatch");
+_Static_assert(offsetof(GuestState, resume_flag) == 160, "GuestState::resume_flag offset mismatch");
+_Static_assert(offsetof(GuestState, xmm) == 168, "GuestState::xmm offset mismatch");
+_Static_assert(offsetof(GuestState, avx_high) == 424, "GuestState::avx_high offset mismatch");
+_Static_assert(offsetof(GuestState, gs_base) == 680, "GuestState::gs_base offset mismatch");
+_Static_assert(offsetof(GuestState, fs_base) == 688, "GuestState::fs_base offset mismatch");
+_Static_assert(offsetof(GuestState, mem_base) == 696, "GuestState::mem_base offset mismatch");
+_Static_assert(offsetof(GuestState, trap_code) == 704, "GuestState::trap_code offset mismatch");
+_Static_assert(offsetof(GuestState, exit_code) == 712, "GuestState::exit_code offset mismatch");
+_Static_assert(_Alignof(GuestState) == 16, "GuestState alignment must be 16 bytes");
+#endif
 
 // Recompiled Unit Function Pointer
 typedef void (*bbr_func_t)(GuestState*);

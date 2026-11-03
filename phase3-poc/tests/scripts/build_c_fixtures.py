@@ -24,7 +24,8 @@ FIXTURE_NAMES = [
     "02_dispatch",
     "03_memory_reloc",
     "04_vector_simd",
-    "05_control_concurrency"
+    "05_control_concurrency",
+    "06_multithread_concurrency"
 ]
 
 def build_fixture(name: str):

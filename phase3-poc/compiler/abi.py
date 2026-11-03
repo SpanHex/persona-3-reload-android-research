@@ -36,7 +36,7 @@ class XMMReg(ctypes.Structure):
 class GuestState(ctypes.Structure):
     """
     Exact in-memory replica of FEXCore CPUState / GuestState (docs/RECOMP_ABI.md).
-    Aligned to 64 bytes.
+    Aligned to 16 bytes, total size 720 bytes.
     """
     _fields_ = [
         ("gregs", ctypes.c_uint64 * 16),      # GPRs: RAX..R15 (0x000)
@@ -69,3 +69,21 @@ BBR_TRAP_UNLIFTABLE  = 1 << 62
 BBR_TRAP_MISS        = 1 << 61
 BBR_TRAP_DIV_ZERO    = 1 << 60
 BBR_TRAP_OVERFLOW    = 1 << 59
+
+# Static runtime verification of binary layout (Milestone 5)
+assert ctypes.sizeof(GuestState) == 720, f"Expected GuestState size 720, got {ctypes.sizeof(GuestState)}"
+assert GuestState.gregs.offset == 0, f"Expected gregs offset 0, got {GuestState.gregs.offset}"
+assert GuestState.rip.offset == 128, f"Expected rip offset 128, got {GuestState.rip.offset}"
+assert GuestState.flags.offset == 136, f"Expected flags offset 136, got {GuestState.flags.offset}"
+assert GuestState.pf_raw.offset == 144, f"Expected pf_raw offset 144, got {GuestState.pf_raw.offset}"
+assert GuestState.af_raw.offset == 148, f"Expected af_raw offset 148, got {GuestState.af_raw.offset}"
+assert GuestState.df_raw.offset == 152, f"Expected df_raw offset 152, got {GuestState.df_raw.offset}"
+assert GuestState._pad0.offset == 156, f"Expected _pad0 offset 156, got {GuestState._pad0.offset}"
+assert GuestState.resume_flag.offset == 160, f"Expected resume_flag offset 160, got {GuestState.resume_flag.offset}"
+assert GuestState.xmm.offset == 168, f"Expected xmm offset 168, got {GuestState.xmm.offset}"
+assert GuestState.avx_high.offset == 424, f"Expected avx_high offset 424, got {GuestState.avx_high.offset}"
+assert GuestState.gs_base.offset == 680, f"Expected gs_base offset 680, got {GuestState.gs_base.offset}"
+assert GuestState.fs_base.offset == 688, f"Expected fs_base offset 688, got {GuestState.fs_base.offset}"
+assert GuestState.mem_base.offset == 696, f"Expected mem_base offset 696, got {GuestState.mem_base.offset}"
+assert GuestState.trap_code.offset == 704, f"Expected trap_code offset 704, got {GuestState.trap_code.offset}"
+assert GuestState.exit_code.offset == 712, f"Expected exit_code offset 712, got {GuestState.exit_code.offset}"
