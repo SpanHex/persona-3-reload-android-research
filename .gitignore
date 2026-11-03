@@ -34,3 +34,6 @@ obj/
 *.o
 __pycache__/
 *.pyc
+.gradle/
+.cxx/
+local.properties

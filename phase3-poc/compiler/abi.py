@@ -39,21 +39,21 @@ class GuestState(ctypes.Structure):
     Aligned to 16 bytes, total size 720 bytes.
     """
     _fields_ = [
-        ("gregs", ctypes.c_uint64 * 16),      # GPRs: RAX..R15 (0x000)
-        ("rip", ctypes.c_uint64),             # Guest instruction pointer (0x080)
-        ("flags", ctypes.c_uint64),           # NZCV / RFLAGS condition flags (0x088)
-        ("pf_raw", ctypes.c_uint32),          # Parity flag raw (0x090)
-        ("af_raw", ctypes.c_uint32),          # Aux carry flag raw (0x094)
-        ("df_raw", ctypes.c_uint32),          # Direction flag raw (0x098)
-        ("_pad0", ctypes.c_uint32),           # Alignment pad (0x09C)
-        ("resume_flag", ctypes.c_uint64),     # Resume entry flag (GranularEntry) (0x0A0)
-        ("xmm", XMMReg * 16),                 # 16 x 128-bit vector registers (0x0A8)
-        ("avx_high", XMMReg * 16),            # 16 x 128-bit AVX upper halves (0x1A8)
-        ("gs_base", ctypes.c_uint64),         # Thread-local storage (TLS) base (0x2A8)
-        ("fs_base", ctypes.c_uint64),         # FS base (0x2B0)
-        ("mem_base", ctypes.c_uint64),        # Guest-to-host memory translation base (0x2B8)
-        ("trap_code", ctypes.c_uint64),       # Reason code if execution traps (0x2C0)
-        ("exit_code", ctypes.c_uint64),       # Host exit / completion status (0x2C8)
+        ("gregs", ctypes.c_uint64 * 16),      # GPRs: RAX..R15 (0x000, 128B)
+        ("rip", ctypes.c_uint64),             # Guest instruction pointer (0x080, 8B)
+        ("flags", ctypes.c_uint64),           # NZCV / RFLAGS condition flags (0x088, 8B)
+        ("pf_raw", ctypes.c_uint32),          # Parity flag raw (0x090, 4B)
+        ("af_raw", ctypes.c_uint32),          # Aux carry flag raw (0x094, 4B)
+        ("df_raw", ctypes.c_uint32),          # Direction flag raw (0x098, 4B)
+        ("_pad0", ctypes.c_uint32),           # Alignment pad (0x09C, 4B)
+        ("resume_flag", ctypes.c_uint64),     # Resume entry flag (GranularEntry) (0x0A0, 8B)
+        ("xmm", XMMReg * 16),                 # 16 x 128-bit vector registers (0x0A8, 256B)
+        ("avx_high", XMMReg * 16),            # 16 x 128-bit AVX upper halves (0x1A8, 256B)
+        ("gs_base", ctypes.c_uint64),         # Thread-local storage (TLS) base (0x2A8, 8B)
+        ("fs_base", ctypes.c_uint64),         # FS base (0x2B0, 8B)
+        ("mem_base", ctypes.c_uint64),        # Guest-to-host memory translation base (0x2B8, 8B)
+        ("trap_code", ctypes.c_uint64),       # Reason code if execution traps (0x2C0, 8B)
+        ("exit_code", ctypes.c_uint64),       # Host exit / completion status (0x2C8, 8B)
     ]
 
 # ABI v2 Flags
@@ -70,7 +70,20 @@ BBR_TRAP_MISS        = 1 << 61
 BBR_TRAP_DIV_ZERO    = 1 << 60
 BBR_TRAP_OVERFLOW    = 1 << 59
 
-# Static runtime verification of binary layout (Milestone 5)
+def create_aligned_guest_state() -> GuestState:
+    """
+    Allocates a GuestState instance guaranteed to be 16-byte aligned.
+    Resolves the limitation where ctypes.alignment(GuestState) is 8 bytes.
+    """
+    raw_buf = (ctypes.c_uint8 * (ctypes.sizeof(GuestState) + 16))()
+    addr = ctypes.addressof(raw_buf)
+    offset = (16 - (addr % 16)) % 16
+    st = GuestState.from_buffer(raw_buf, offset)
+    st._backing_buffer = raw_buf
+    assert ctypes.addressof(st) % 16 == 0, f"Pointer {hex(ctypes.addressof(st))} is not 16-byte aligned"
+    return st
+
+# Static runtime verification of binary layout (Milestone 3)
 assert ctypes.sizeof(GuestState) == 720, f"Expected GuestState size 720, got {ctypes.sizeof(GuestState)}"
 assert GuestState.gregs.offset == 0, f"Expected gregs offset 0, got {GuestState.gregs.offset}"
 assert GuestState.rip.offset == 128, f"Expected rip offset 128, got {GuestState.rip.offset}"

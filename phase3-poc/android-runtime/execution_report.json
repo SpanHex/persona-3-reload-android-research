@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-03T19:37:44Z",
+  "timestamp": "2026-11-03T20:22:30Z",
   "test_suite_version": "2.0.0-phase3.1-authoritative",
   "target_hardware": {
     "device": "realme 12 Pro+",
@@ -38,7 +38,7 @@
         "entrypoint": "0x2013d0",
         "return_value_uint64": 14395263374464838504,
         "return_value_hex": "0xc7c63fc50b2aeb68",
-        "execution_time_ms": 2.424
+        "execution_time_ms": 0.509
       },
       "arm64_translated": {
         "success": true,
@@ -48,7 +48,7 @@
         "return_value_hex": "0xc7c63fc50b2aeb68",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 5.218
+        "execution_time_ms": 2.461
       },
       "bit_exact_match": true
     },
@@ -66,7 +66,7 @@
         "entrypoint": "0x2012a0",
         "return_value_uint64": 6965,
         "return_value_hex": "0x1b35",
-        "execution_time_ms": 0.235
+        "execution_time_ms": 0.239
       },
       "arm64_translated": {
         "success": true,
@@ -76,7 +76,7 @@
         "return_value_hex": "0x1b35",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.176
+        "execution_time_ms": 1.197
       },
       "bit_exact_match": true
     },
@@ -104,7 +104,7 @@
         "return_value_hex": "0x29f9f9e047",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.023
+        "execution_time_ms": 1.035
       },
       "bit_exact_match": true
     },
@@ -122,7 +122,7 @@
         "entrypoint": "0x2013a0",
         "return_value_uint64": 1947358608,
         "return_value_hex": "0x74125590",
-        "execution_time_ms": 0.385
+        "execution_time_ms": 0.205
       },
       "arm64_translated": {
         "success": true,
@@ -132,7 +132,7 @@
         "return_value_hex": "0x74125590",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.412
+        "execution_time_ms": 1.141
       },
       "bit_exact_match": true
     },
@@ -150,7 +150,7 @@
         "entrypoint": "0x201260",
         "return_value_uint64": 18446744073709550734,
         "return_value_hex": "0xfffffffffffffc8e",
-        "execution_time_ms": 0.152
+        "execution_time_ms": 0.155
       },
       "arm64_translated": {
         "success": true,
@@ -160,7 +160,7 @@
         "return_value_hex": "0xfffffffffffffc8e",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 0.748
+        "execution_time_ms": 0.757
       },
       "bit_exact_match": true
     },
@@ -178,7 +178,7 @@
         "entrypoint": "0x201300",
         "return_value_uint64": 859025102792,
         "return_value_hex": "0xc801e2d7c8",
-        "execution_time_ms": 0.316
+        "execution_time_ms": 0.308
       },
       "arm64_translated": {
         "success": true,
@@ -188,7 +188,7 @@
         "return_value_hex": "0xc801e2d7c8",
         "trap_code": 0,
         "exit_code": 0,
-        "execution_time_ms": 1.761
+        "execution_time_ms": 1.792
       },
       "bit_exact_match": true
     }

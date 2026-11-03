@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.p3r.poc'
     compileSdk 34
+    ndkVersion "26.3.11579264"
 
     defaultConfig {
         applicationId "com.p3r.poc"

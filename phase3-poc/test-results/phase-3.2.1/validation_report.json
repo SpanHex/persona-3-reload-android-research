@@ -1,0 +1,230 @@
+{
+  "report_id": "P3R-AUTOTEST-321-001",
+  "timestamp": "2026-11-03T20:26:14Z",
+  "phase": "3.2.1-evidence-validation",
+  "toolchain": {
+    "python": "3.13.15",
+    "ndk_version": "26.3.11579264 (r26c LTS)",
+    "clang_version": "17.0.2 (NDK r26c)",
+    "cmake_version": "3.22.1",
+    "gradle_version": "8.5",
+    "java_version": "17.0.21 (Microsoft OpenJDK LTS)",
+    "target_api": 34,
+    "target_abi": "arm64-v8a"
+  },
+  "physical_hardware": {
+    "target": "realme 12 Pro+ 5G (Snapdragon 7s Gen 2)",
+    "attached": false,
+    "status": "NOT_TESTED",
+    "reason": "Missing hardware connection"
+  },
+  "apk_packaging": {
+    "path": "E:\\persona 3 reload android port\\research\\P3R-Android-Research\\phase3-poc\\android-app\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "6f876fe4f146535d6af88d838ccc8ad8bf3347c379f54db0fbc963ccc3d57e70",
+    "exists": true
+  },
+  "summary": {
+    "total_fixtures": 6,
+    "compiled_count": 6,
+    "linked_count": 6,
+    "loaded_count": 6,
+    "symbol_resolved_count": 6,
+    "executed_count": 6,
+    "matched_count": 6,
+    "all_mandatory_passed": true
+  },
+  "fixtures": [
+    {
+      "fixture": "01_arithmetic",
+      "description": "Integer arithmetic, high-byte registers (ah/ch/dh/bh), safe division, scalar floats, recursion (factorial, fibonacci)",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0xc7c63fc50b2aeb68",
+        "uint64": 14395263374464838504,
+        "execution_time_ms": 0.388
+      },
+      "actual_result": {
+        "hex": "0xc7c63fc50b2aeb68",
+        "uint64": 14395263374464838504,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 2.479
+      },
+      "hashes": {
+        "input_elf_sha256": "b6bc8b691315af4e1ee37935240246824e705a99e799764206a0d8194660c089",
+        "recompiled_obj_sha256": "300421e9fad2085f59d8ad17b0260b7f0d0dbbdfafdac00a30a8bf4c0bb8c88a",
+        "linked_so_sha256": "93697581656ff2647b7c4f572ec48f4d353078ba7495a86d387a055eb80313f8"
+      },
+      "error": null
+    },
+    {
+      "fixture": "02_dispatch",
+      "description": "Direct calls, indirect function pointers, simulated C++ vtable dispatch, jump table switches",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0x1b35",
+        "uint64": 6965,
+        "execution_time_ms": 0.301
+      },
+      "actual_result": {
+        "hex": "0x1b35",
+        "uint64": 6965,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.431
+      },
+      "hashes": {
+        "input_elf_sha256": "208beb2ec2d3fe5cface670473520ce00f9eb34d1c0584ea09ac99ea692b6a36",
+        "recompiled_obj_sha256": "209b53005c47ffa9cd87a37d1e2819900a24f817fc75a6a58a49ed06ff75c2fb",
+        "linked_so_sha256": "03c250b78a138eca23bd5dce429c6015b3fca5a74a2e37ca71707b3c4214a0e6"
+      },
+      "error": null
+    },
+    {
+      "fixture": "03_memory_reloc",
+      "description": "Global rodata/data access, struct traversal, pointer arithmetic, stack alignment",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0x29f9f9e047",
+        "uint64": 180287561799,
+        "execution_time_ms": 0.182
+      },
+      "actual_result": {
+        "hex": "0x29f9f9e047",
+        "uint64": 180287561799,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 1.081
+      },
+      "hashes": {
+        "input_elf_sha256": "c51b7758c11f71dcbe3afb6c4380b23794c2678fe0005da8a475f3fcc5a41733",
+        "recompiled_obj_sha256": "c8d0a5d3117c314d1353eac2ab4012d43d28a7d2e1ff80eb478a00a6c5ae332d",
+        "linked_so_sha256": "6e169faf29dd9f5d7bcee51b0081fd816954365184aa4b9033dd213c177cc132"
+      },
+      "error": null
+    },
+    {
+      "fixture": "04_vector_simd",
+      "description": "SSE/SSE2 packed float, packed int, and packed double vector operations",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0x74125590",
+        "uint64": 1947358608,
+        "execution_time_ms": 0.217
+      },
+      "actual_result": {
+        "hex": "0x74125590",
+        "uint64": 1947358608,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 0.9
+      },
+      "hashes": {
+        "input_elf_sha256": "7427c97534aefcdf915577d2455bfe104a8acb5f6c8ccad0e2e4e5f69c7d8f9c",
+        "recompiled_obj_sha256": "d85338e81fef5f0d5a5a75d40f12503ce445e29ddc184810d059e368713e9e3b",
+        "linked_so_sha256": "fa74dc4ab1ebc0d42aa1ca9c8dcd5d9026e9a0d50a5e272b4770ea631dae3a31"
+      },
+      "error": null
+    },
+    {
+      "fixture": "05_control_concurrency",
+      "description": "Spin-wait loop simulation, atomic fetch-and-add (xadd) / compare-and-swap (cmpxchg), condition flow",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0xfffffffffffffc8e",
+        "uint64": 18446744073709550734,
+        "execution_time_ms": 0.232
+      },
+      "actual_result": {
+        "hex": "0xfffffffffffffc8e",
+        "uint64": 18446744073709550734,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 0.951
+      },
+      "hashes": {
+        "input_elf_sha256": "d8b19cd3c13975b07bcfa5676b4ae496a08da0c3bf81395d4f9d2cf70d40ac73",
+        "recompiled_obj_sha256": "1fcd6ae0053c1f319c94568612f231ce0d4bdc69a0bf75ed46a82df974bbf7af",
+        "linked_so_sha256": "6b27ba68a41750516dabee6cbe4aa2cdc213de973a06396709b9594e12410b58"
+      },
+      "error": null
+    },
+    {
+      "fixture": "06_multithread_concurrency",
+      "description": "Multi-threaded concurrency, atomic xadd, atomic cmpxchg loop, spinlock test-and-set xchgl",
+      "compiled": true,
+      "linked": true,
+      "loaded": true,
+      "symbol_resolved": true,
+      "executed": true,
+      "matched": true,
+      "execution_environment": "unicorn_aarch64",
+      "reference_environment": "unicorn_x86_64",
+      "physical_device_environment": "physical_android_arm64",
+      "physical_device_status": "NOT_TESTED",
+      "expected_result": {
+        "hex": "0xc801e2d7c8",
+        "uint64": 859025102792,
+        "execution_time_ms": 0.334
+      },
+      "actual_result": {
+        "hex": "0xc801e2d7c8",
+        "uint64": 859025102792,
+        "trap_code": 0,
+        "exit_code": 0,
+        "execution_time_ms": 2.154
+      },
+      "hashes": {
+        "input_elf_sha256": "6441a881d54391c18ef98208bf0f2df3f744335c4d34f1ab37f39caa95e8b867",
+        "recompiled_obj_sha256": "9a051128614b0f82de3c21246a64a3a11c07f188658b3660b3461292a5b2c40d",
+        "linked_so_sha256": "99d5bfdd0575f1a3238218e3051a07416f300fb6f8aad323fbf57f196a186e5e"
+      },
+      "error": null
+    }
+  ]
+}

@@ -1,13 +1,46 @@
 # Persona 3 Reload — PS4 to Android Technical Research & Architecture
 
-[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3_%26_3.1_%26_3.2-Validation_Complete-success?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/Phase_1_%26_2_%26_3_%26_3.1_%26_3.2_%26_3.2.1-Validation_Complete-success?style=for-the-badge)](#)
 [![Target](https://img.shields.io/badge/Target-Android_ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge)](#licensing--legal-compliance)
 [![Engine](https://img.shields.io/badge/Engine-Unreal_Engine_4.27-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white)](#)
 
-> **RESEARCH, PROOF-OF-CONCEPT & FUNCTIONAL VALIDATION (PHASES 1, 2, 3, 3.1 & 3.2):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, empirical differential execution validation, and Android Bionic native execution validation for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
+> **RESEARCH, PROOF-OF-CONCEPT & FUNCTIONAL VALIDATION (PHASES 1, 2, 3, 3.1, 3.2 & 3.2.1):** Complete reverse-engineering investigation, native systems architecture analysis, ahead-of-time (AOT) recompilation proof of concept, empirical differential execution validation, Android Bionic native execution validation, and evidence-based runtime corrections for adapting the PlayStation 4 release of **Persona 3 Reload** into a dedicated native Android ARM64 application.
 > 
 > *Notice: This repository contains research documents, architecture maps, dependency matrices, proof-of-concept compilers, and system diagrams only. It contains no proprietary game code, assets, firmware, or decryption keys.*
+
+---
+
+## 🛡️ PHASE 3.2.1: EVIDENCE-BASED ANDROID VALIDATION & RUNTIME CORRECTIONS (COMPLETE — CONDITIONAL GO)
+
+Phase 3.2.1 was conducted as a rigorous, corrective validation phase to audit previous assertions, eliminate artificial stubs, and enforce empirical evidence across all subsystems:
+- **Purged Fake Bionic Stubs:** Permanently deleted mock `libc.so` and `libdl.so` stub generators. Replaced validation path with the official **Google Android NDK r26c** (`26.3.11579264`) and genuine Bionic sysroots (`sysroot/usr/lib/aarch64-linux-android/30`).
+- **Enforced Cross-Layer ABI Alignment:** Verified `sizeof(GuestState) == 720` and `_Alignof == 16`. Implemented `create_aligned_guest_state()` in `abi.py` to overcome Python `ctypes` 8-byte default alignment, guaranteeing 16-byte memory alignment for AArch64 SIMD vector operations.
+- **Official Android Application Build:** Successfully built `app-debug.apk` (11.23 MB, SHA-256: `6f876fe4f146535d6af88d838ccc8ad8bf3347c379f54db0fbc963ccc3d57e70`) using AGP 8.2.2, Gradle 8.5, and Microsoft OpenJDK 17. Confirmed that all 7 native `.so` files are properly packaged in `lib/arm64-v8a/`.
+- **First Function Execution Proven:** Differential execution of Fixture 01 (`01_arithmetic`) matched the independent x86-64 reference oracle bit-exactly (`0xc7c63fc50b2aeb68`).
+- **Full 6-Fixture Suite Expansion:** Evaluated all six synthetic fixtures (`01` through `06`), achieving **6 / 6 Bit-Exact Matches (100.0%)** with zero traps.
+- **Multithreaded Concurrency Delineation:** Separated single-threaded atomic instruction testing from true POSIX multi-threaded contention; authored a native 4-thread POSIX contention test in `bionic_runner.c`.
+- **Truthful Hardware Reporting:** Explicitly marked physical **realme 12 Pro+ (Snapdragon 7s Gen 2)** execution as **`NOT_TESTED`** due to disconnected ADB bus; zero fabricated device logs.
+- **Performance Speculation Retracted:** Removed all unsupported claims ("25x-40x speedups", "P3R 60 FPS", "thermal throttling") and established an environment-attributed measurement matrix.
+
+Phase 3.2.1 produced 12 authoritative reports located in [`documentation/PHASE_3_2_1/`](documentation/PHASE_3_2_1/):
+
+| Document | Report Title | Core Focus & Findings |
+|---|---|---|
+| [`P3R-DOC-321-INDEX`](documentation/PHASE_3_2_1/PHASE_3_2_1_INDEX.md) | **[Phase 3.2.1 Master Index](documentation/PHASE_3_2_1/PHASE_3_2_1_INDEX.md)** | Master index, phase overview, artifact links, and next phase transition guidelines. |
+| [`P3R-DOC-321-AUDIT`](documentation/PHASE_3_2_1/CLAIM_AUDIT.md) | **[Repository & Claim Audit](documentation/PHASE_3_2_1/CLAIM_AUDIT.md)** | Empirical audit of all Phase 3.2 claims into Verified, Unverified, and Not Tested categories. |
+| [`P3R-DOC-321-BIONIC`](documentation/PHASE_3_2_1/BIONIC_VALIDATION_CORRECTIONS.md) | **[Bionic Validation Corrections](documentation/PHASE_3_2_1/BIONIC_VALIDATION_CORRECTIONS.md)** | Fake stub elimination, official NDK r26c sysroots, dynamic linker verification. |
+| [`P3R-DOC-321-ABI`](documentation/PHASE_3_2_1/ABI_CORRECTIONS.md) | **[GuestState ABI Alignment](documentation/PHASE_3_2_1/ABI_CORRECTIONS.md)** | 720B layout, 16-byte alignment, Python ctypes buffer alignment fix, GEP offsets. |
+| [`P3R-DOC-321-APK`](documentation/PHASE_3_2_1/ANDROID_BUILD_VALIDATION.md) | **[Android Build Validation](documentation/PHASE_3_2_1/ANDROID_BUILD_VALIDATION.md)** | AGP 8.2.2 / Gradle 8.5 build of `app-debug.apk`, SHA-256 hash, native library packaging. |
+| [`P3R-DOC-321-EXEC01`](documentation/PHASE_3_2_1/FIRST_NATIVE_EXECUTION.md) | **[First Function Execution](documentation/PHASE_3_2_1/FIRST_NATIVE_EXECUTION.md)** | End-to-end pipeline proof of 01_arithmetic matching 0xc7c63fc50b2aeb68 bit-exactly. |
+| [`P3R-DOC-321-ALL`](documentation/PHASE_3_2_1/ALL_FIXTURES_VALIDATION.md) | **[All Fixtures Validation Matrix](documentation/PHASE_3_2_1/ALL_FIXTURES_VALIDATION.md)** | Comprehensive 6/6 fixture differential execution results and state verification. |
+| [`P3R-DOC-321-CONC`](documentation/PHASE_3_2_1/CONCURRENCY_VALIDATION.md) | **[Concurrency Validation](documentation/PHASE_3_2_1/CONCURRENCY_VALIDATION.md)** | Atomics, memory models (TSO vs Weak), native POSIX 4-thread contention test. |
+| [`P3R-DOC-321-REALME`](documentation/PHASE_3_2_1/REALME_DEVICE_VALIDATION.md) | **[Realme 12 Pro+ Validation](documentation/PHASE_3_2_1/REALME_DEVICE_VALIDATION.md)** | Target hardware profile, ADB bus audit (`NOT_TESTED`), on-device deployment protocol. |
+| [`P3R-DOC-321-PERF`](documentation/PHASE_3_2_1/CORRECTED_PERFORMANCE_REPORT.md) | **[Corrected Performance Report](documentation/PHASE_3_2_1/CORRECTED_PERFORMANCE_REPORT.md)** | Retraction of unsubstantiated claims; environment-segmented execution timings. |
+| [`P3R-DOC-321-RISK`](documentation/PHASE_3_2_1/RISK_REGISTER.md) | **[Risk Register](documentation/PHASE_3_2_1/RISK_REGISTER.md)** | Updated technical risk register, hardware mitigations, and Phase 4 handoff items. |
+| [`P3R-DOC-321-FINAL`](documentation/PHASE_3_2_1/FINAL_VALIDATION_REPORT.md) | **[Final Validation Report](documentation/PHASE_3_2_1/FINAL_VALIDATION_REPORT.md)** | Definitive answers to all 10 engineering questions and **CONDITIONAL GO** verdict. |
+
+---
 
 ---
 

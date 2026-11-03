@@ -27,7 +27,7 @@ from unicorn import x86_const, arm64_const, UC_HOOK_MEM_UNMAPPED
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMPILER_DIR = os.path.join(REPO_ROOT, "compiler")
 sys.path.insert(0, COMPILER_DIR)
-from abi import GuestState
+from abi import GuestState, create_aligned_guest_state
 
 BIN_DIR = os.path.join(REPO_ROOT, "tests", "bin")
 MANIFEST_PATH = os.path.join(REPO_ROOT, "tests", "expected", "manifest.json")
@@ -163,8 +163,8 @@ def run_arm64_translated(so_path: str, elf_path: str, entrypoint_symbol: str) ->
     mu.mem_map(EXIT_ADDR, 0x1000)
     mu.mem_map(GUEST_STACK_VADDR, 0x100000)
 
-    # Initialize GuestState according to Recomp ABI v2
-    st = GuestState()
+    # Initialize GuestState with guaranteed 16-byte alignment according to Recomp ABI v2
+    st = create_aligned_guest_state()
     st.gregs[4] = GUEST_STACK_VADDR + 0x80000 # RSP (guest stack)
     st.gregs[5] = GUEST_STACK_VADDR + 0x80000 # RBP
     st.mem_base = 0                          # Flat 1:1 memory mapping
